@@ -28,3 +28,14 @@ yarn.lock
 *.njsproj
 *.sln
 *.sw?
+
+# Local env overrides. `.env.development` / `.env.production` stay tracked on
+# purpose — they only carry public VITE_* config baked into the bundle.
+.env.local
+.env.*.local
+
+# testing
+/coverage
+
+# vercel
+.vercel
