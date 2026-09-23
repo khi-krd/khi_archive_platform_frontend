@@ -439,10 +439,10 @@ function AccountProfilePage() {
       <main className="khi-account">
         {isLoading ? (
           <div aria-busy="true" aria-label="بارکردنی هەژمار">
-            <div className="acc-skel" style={{ height: 268, borderRadius: 28 }} />
+            <div className="acc-skel" style={{ height: 268, borderRadius: 10 }} />
             <div className="acc-body">
               <div className="acc-skel" style={{ height: 260 }} />
-              <div className="acc-skel" style={{ height: 420, borderRadius: 22 }} />
+              <div className="acc-skel" style={{ height: 420 }} />
             </div>
           </div>
         ) : loadError ? (

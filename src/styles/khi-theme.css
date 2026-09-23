@@ -27,24 +27,24 @@
   --card-foreground:#211d15;
   --popover:var(--card);
   --popover-foreground:#211d15;
-  --primary:#1f3a31;
+  --primary:#19563a;
   --primary-foreground:#f6eeda;
   --secondary:color-mix(in srgb,#ffffff,var(--secondary-base) calc(var(--khi-tone,100) * 1%));
-  --secondary-foreground:#1f3a31;
+  --secondary-foreground:#19563a;
   --muted:color-mix(in srgb,#ffffff,var(--muted-base) calc(var(--khi-tone,100) * 1%));
   --muted-foreground:#6b6045;
   --accent:#e7d3a0;
-  --accent-foreground:#142620;
+  --accent-foreground:#123f2a;
   --destructive:#b4512c;
   --border:#d8c8a6;
   --input:#cdbd99;
   --ring:#b08833;
   --sidebar:var(--card);
   --sidebar-foreground:#211d15;
-  --sidebar-primary:#1f3a31;
+  --sidebar-primary:#19563a;
   --sidebar-primary-foreground:#f6eeda;
   --sidebar-accent:var(--secondary);
-  --sidebar-accent-foreground:#1f3a31;
+  --sidebar-accent-foreground:#19563a;
   --sidebar-border:#d8c8a6;
   --sidebar-ring:#b08833;
   --font-sans:'Vazirmatn',Tahoma,system-ui,sans-serif;
@@ -72,26 +72,26 @@
   --card-foreground:#1b201d;
   --popover:#ffffff;
   --popover-foreground:#1b201d;
-  --primary:#1f3a31;
+  --primary:#19563a;
   --primary-foreground:#f7faf8;
   --secondary:#f2f5f2;
-  --secondary-foreground:#1f3a31;
+  --secondary-foreground:#19563a;
   --muted:#f4f7f4;
   --muted-foreground:#5f6b64;
   --accent:#e8efea;
-  --accent-foreground:#142620;
+  --accent-foreground:#123f2a;
   --destructive:#b4512c;
   --border:#e3e8e4;
   --input:#d3dbd6;
-  --ring:#2c5448;
+  --ring:#217049;
   --sidebar:#ffffff;
   --sidebar-foreground:#1b201d;
-  --sidebar-primary:#1f3a31;
+  --sidebar-primary:#19563a;
   --sidebar-primary-foreground:#f7faf8;
   --sidebar-accent:#f2f5f2;
-  --sidebar-accent-foreground:#1f3a31;
+  --sidebar-accent-foreground:#19563a;
   --sidebar-border:#e3e8e4;
-  --sidebar-ring:#2c5448;
+  --sidebar-ring:#217049;
   --font-sans:'Vazirmatn',Tahoma,system-ui,sans-serif;
   --font-heading:'Vazirmatn',Tahoma,system-ui,sans-serif;
   background-color:#ffffff;
@@ -100,32 +100,32 @@
 
 /* A touch of gold on brand/icon chips so the pine reads as "archive" — kept on
    the warm modal, dropped on the white workspace (a neutral ring instead). */
-.khi-surface .khi-mark{border:1px solid rgba(214,178,94,.45);box-shadow:0 6px 18px rgba(31,58,49,.22)}
+.khi-surface .khi-mark{border:1px solid rgba(214,178,94,.45);box-shadow:0 6px 18px rgba(25,86,58,.22)}
 .khi-teacher .khi-mark{border:1px solid #e3e8e4;box-shadow:0 4px 14px rgba(27,32,29,.12)}
 
 .dark .khi-surface{
-  --background:#101e17;
+  --background:#0c2c1d;
   --foreground:#f3ead4;
-  --card:#142620;
+  --card:#123f2a;
   --card-foreground:#f3ead4;
-  --popover:#142620;
+  --popover:#123f2a;
   --popover-foreground:#f3ead4;
   --primary:#d6b25e;
-  --primary-foreground:#142620;
+  --primary-foreground:#123f2a;
   --secondary:#1d362c;
   --secondary-foreground:#f3ead4;
   --muted:#1b3128;
   --muted-foreground:#c8d2c4;
-  --accent:#2c5448;
+  --accent:#217049;
   --accent-foreground:#f3ead4;
   --destructive:#e0795a;
   --border:rgba(231,211,160,.16);
   --input:rgba(231,211,160,.20);
   --ring:#d6b25e;
-  --sidebar:#142620;
+  --sidebar:#123f2a;
   --sidebar-foreground:#f3ead4;
   --sidebar-primary:#d6b25e;
-  --sidebar-primary-foreground:#142620;
+  --sidebar-primary-foreground:#123f2a;
   --sidebar-accent:#1d362c;
   --sidebar-accent-foreground:#f3ead4;
   --sidebar-border:rgba(231,211,160,.16);
@@ -173,31 +173,31 @@
   --card-foreground:#211d15;
   --popover:#ffffff;
   --popover-foreground:#211d15;
-  --primary:#1f3a31;
+  --primary:#19563a;
   --primary-foreground:#f6eeda;
   --secondary:#f4f7f3;
-  --secondary-foreground:#1f3a31;
+  --secondary-foreground:#19563a;
   --muted:#f7f9f6;
   --muted-foreground:#687367;
   --accent:#e7d3a0;
-  --accent-foreground:#142620;
+  --accent-foreground:#123f2a;
   --destructive:#b4512c;
   --border:#d8e2d7;
   --input:#cbd8ca;
-  --ring:#2c5448;
+  --ring:#217049;
   --sidebar:#ffffff;
   --sidebar-foreground:#211d15;
-  --sidebar-primary:#1f3a31;
+  --sidebar-primary:#19563a;
   --sidebar-primary-foreground:#f6eeda;
   --sidebar-accent:#f4f7f3;
-  --sidebar-accent-foreground:#1f3a31;
+  --sidebar-accent-foreground:#19563a;
   --sidebar-border:#d8e2d7;
-  --sidebar-ring:#2c5448;
+  --sidebar-ring:#217049;
 }
 
 /* ── "Help us improve" dialog — heritage polish (scoped to .khi-help-dialog) ── */
 .khi-help-shell{
-  box-shadow:0 50px 110px -34px rgba(16,30,23,.74),0 14px 34px -20px rgba(16,30,23,.4);
+  box-shadow:0 50px 110px -34px rgba(12,44,29,.74),0 14px 34px -20px rgba(12,44,29,.4);
 }
 /* Header: warm pine-tinted wash closed by a fine gold hairline. */
 .khi-help-dialog .khi-help-head{
@@ -219,16 +219,16 @@
   background:linear-gradient(180deg,#fffdf9, var(--secondary));
   border-color:var(--border);
   border-inline-start:3px solid var(--accent);
-  box-shadow:0 10px 24px -18px rgba(31,58,49,.5), inset 0 1px 0 rgba(255,255,255,.6);
+  box-shadow:0 10px 24px -18px rgba(25,86,58,.5), inset 0 1px 0 rgba(255,255,255,.6);
 }
 /* Correction textarea: a calm pine focus glow. */
 .khi-help-dialog .khi-help-textarea:focus{
-  box-shadow:0 0 0 4px rgba(44,84,72,.13), inset 0 1px 3px rgba(20,38,32,.07);
+  box-shadow:0 0 0 4px rgba(33,112,73,.13), inset 0 1px 3px rgba(18,63,42,.07);
 }
 /* Field option: the selected row lifts onto the card surface and carries its
    section tone; the whole row is a 52px target so it stays thumb-friendly. */
 .khi-help-dialog .khi-help-option[aria-selected="true"]{
-  box-shadow:0 6px 16px -12px rgba(31,58,49,.55);
+  box-shadow:0 6px 16px -12px rgba(25,86,58,.55);
 }
 .khi-help-dialog .khi-help-option:active{transform:translateY(.5px)}
 /* Both scroll panes keep a slim, on-brand scrollbar instead of the OS default. */

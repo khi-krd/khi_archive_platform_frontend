@@ -134,7 +134,7 @@ function AuthShell({ title, description, children, footer, className }) {
           >
             {/* Fixed pine→gold→pine so the brand accent reads the same in light
                 and dark (the dark --accent middle would otherwise look muddy). */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#1f3a31] via-[#d6b25e] to-[#1f3a31]" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#19563a] via-[#d6b25e] to-[#19563a]" />
 
             <header className="space-y-2">
               <h1 className="text-[1.7rem] font-semibold leading-tight tracking-tight text-foreground">{title}</h1>

@@ -150,7 +150,7 @@
   --card-foreground: #221e17;
   --popover: #fbf6ea;
   --popover-foreground: #221e17;
-  --primary: #1f3a31;
+  --primary: #19563a;
   --primary-foreground: #f3ead4;
   --secondary: #ece0c9;
   --secondary-foreground: #221e17;
@@ -161,7 +161,7 @@
   --destructive: #b4512c;
   --border: #e0d4ba;
   --input: #d4c5a4;
-  --ring: #2c5448;
+  --ring: #217049;
   color: var(--foreground);
   background-color: var(--background);
   /* Soft warm radial wash + faint paper grain, mirroring the public shell. */

@@ -78,7 +78,7 @@ const KU = {
 // tone can safely tint TEXT as well as the dot). Colour is never the only cue —
 // every section also carries its own icon and its name.
 const TONE = {
-  content: '#1f3a31',
+  content: '#19563a',
   form: '#5b3f86',
   people: '#8f5314',
   language: '#0f5f57',
