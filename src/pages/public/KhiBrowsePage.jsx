@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 import { HighlightProvider } from '@/components/ui/highlight'
-import { readMediaTypeCount, decodeSelectedFacets } from '@/components/public/public-helpers'
+import { readFacet, readMediaTypeCount, decodeSelectedFacets } from '@/components/public/public-helpers'
 import { guestAudios, guestFacets, guestImages, guestTexts, guestVideos } from '@/services/guest'
 import { getStaffBrowsePage, getStaffMediaPage } from '@/services/staff-public-catalog'
 import { usePublicAccess } from '@/hooks/use-public-access'
@@ -83,17 +83,18 @@ async function loadPublicMediaSections(params, selectedKinds, staff = false) {
   return { items, totalElements, totalPages, number: params.page }
 }
 
-// Skeleton placeholder cards shown while a page of results loads.
+// Skeleton placeholder cards shown while a page of results loads — the same
+// full-bleed tile as a real card, with two ghost text lines where the title
+// and category land.
 function SkeletonGrid() {
   return (
     <div className="khi-grid">
       {Array.from({ length: 8 }).map((_, i) => (
         <div key={i} className="card skeleton">
           <div className="media" />
-          <div className="body">
+          <div className="card-overlay">
+            <div className="sk-line" style={{ width: '70%', height: 16 }} />
             <div className="sk-line" style={{ width: '40%' }} />
-            <div className="sk-line" style={{ width: '85%', height: 18 }} />
-            <div className="sk-line" style={{ width: '60%' }} />
           </div>
         </div>
       ))}
@@ -105,11 +106,9 @@ export function KhiBrowsePage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const { isStaff, ready: accessReady } = usePublicAccess()
   const resultsRef = useRef(null)
-  // Filter rail visibility. Open by default on desktop; closed (drawer) on
-  // phones/tablets so it never blocks the catalogue on first paint.
-  const [sidebarOpen, setSidebarOpen] = useState(
-    () => (typeof window !== 'undefined' ? window.matchMedia('(min-width:1025px)').matches : true),
-  )
+  // Filter rail visibility. Closed by default everywhere — the catalogue leads
+  // and the rail opens from the toolbar's filter button (a drawer on phones).
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const q = searchParams.get('q') || ''
   const view = searchParams.get('layout') === 'list' ? 'list' : 'grid'
@@ -383,11 +382,17 @@ export function KhiBrowsePage() {
   }, [textDrafts, type.textFilters])
 
   // ── Active-filter chips ──────────────────────────────────────────────────────
+  // Selected values are stored as codes (categoryCode, personCode…); the chip
+  // shows the facet's display name so a visitor never sees a technical code.
+  const facetLabel = (group, val) => {
+    const entry = readFacet(allFacets, group.facetKey || group.paramKey).find((e) => (e.code || e.value) === val)
+    return entry?.value || val
+  }
   const chips = []
   if (q) chips.push({ key: 'q', label: `«${q}»`, onRemove: () => update({ q: null }) })
   for (const group of filterGroups) {
     for (const val of selected[group.paramKey] || []) {
-      chips.push({ key: `${group.paramKey}:${val}`, label: `${group.title}: ${val}`, onRemove: () => onToggleFacet(group.paramKey, val) })
+      chips.push({ key: `${group.paramKey}:${val}`, label: `${group.title}: ${facetLabel(group, val)}`, onRemove: () => onToggleFacet(group.paramKey, val) })
     }
   }
   for (const k of selectedMediaTypes) chips.push({ key: `mt:${k}`, label: ({ audio: 'دەنگ', video: 'ڤیدیۆ', text: 'دەق', image: 'وێنە' })[k], onRemove: () => onToggleMediaType(k) })
