@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Check, ImageIcon, Loader2, RefreshCw, Trash2, Upload, X } from 'lucide-react'
+import { ImageIcon, Loader2, RefreshCw, Trash2, Upload } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -30,13 +30,6 @@ function formatTimestamp(value) {
   return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(
     parsed,
   )
-}
-
-function formatBytes(bytes) {
-  if (!bytes) return ''
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`
 }
 
 // Renders the candidate the way the sign-in page will: just the photo,
@@ -128,24 +121,18 @@ function AuthImageManager() {
     setFilePreview(previewUrlRef.current)
   }
 
+  // Picked = committed: a valid file uploads immediately, no second click.
   const chooseFile = (picked) => {
-    if (!picked) return
+    if (!picked || isSaving) return
     const message = validateAuthImageFile(picked)
     if (message) {
-      setPendingFile(null)
       setFileError(message)
       return
     }
     setFileError('')
     setSaveError(null)
-    setPendingFile(picked)
-  }
-
-  const clearFile = () => {
-    setPendingFile(null)
-    setFileError('')
-    setSaveError(null)
-    if (inputRef.current) inputRef.current.value = ''
+    setPendingFile(picked) // drives the live preview while it uploads
+    handleSave(picked)
   }
 
   const handleInputChange = (event) => {
@@ -159,8 +146,9 @@ function AuthImageManager() {
     chooseFile(event.dataTransfer?.files?.[0])
   }
 
-  const handleSave = async () => {
-    if (!file) return
+  const handleSave = async (picked) => {
+    const upload = picked ?? file
+    if (!upload) return
 
     setIsSaving(true)
     setSaveError(null)
@@ -175,12 +163,11 @@ function AuthImageManager() {
 
     try {
       const saved = record?.id != null
-        ? await replaceAuthImage(record.id, file, uploadOptions)
-        : await uploadAuthImage(file, uploadOptions)
+        ? await replaceAuthImage(record.id, upload, uploadOptions)
+        : await uploadAuthImage(upload, uploadOptions)
 
       setRecord(saved)
       setActiveAuthImage(saved)
-      clearFile()
       toast.success(
         record?.id != null ? 'Panel image replaced' : 'Panel image uploaded',
         'The sign-in and register pages now show the new image.',
@@ -191,6 +178,8 @@ function AuthImageManager() {
     } finally {
       setIsSaving(false)
       setProgress(0)
+      setPendingFile(null)
+      if (inputRef.current) inputRef.current.value = ''
     }
   }
 
@@ -278,61 +267,46 @@ function AuthImageManager() {
               </div>
             </div>
 
-            {file ? (
-              <div className="flex items-center gap-3 rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.04] p-4">
-                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-emerald-500/10 text-emerald-700 ring-1 ring-emerald-500/20 dark:text-emerald-300">
-                  <Check className="size-5" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-foreground">{file.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatBytes(file.size)} · shown in the preview above, not saved yet
-                  </p>
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-label="Clear the selected file"
-                  disabled={isSaving}
-                  onClick={clearFile}
-                >
-                  <X className="size-4" />
-                </Button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                className={cn(
-                  'flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-5 py-9 text-center transition-colors',
-                  isDragging
-                    ? 'border-primary bg-primary/[0.06]'
-                    : 'border-border bg-muted/20 hover:border-primary/50 hover:bg-primary/[0.03]',
-                )}
-                onClick={() => inputRef.current?.click()}
-                onDragLeave={() => setIsDragging(false)}
-                onDragOver={(event) => {
-                  event.preventDefault()
-                  setIsDragging(true)
-                }}
-                onDrop={handleDrop}
-              >
-                <span className="grid size-12 place-items-center rounded-2xl bg-background text-primary shadow-sm ring-1 ring-border">
-                  <Upload className="size-5" />
-                </span>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">
-                    {hasUploadedImage ? 'Choose a replacement image' : 'Choose the panel image'}
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Drag a file here or click to browse
-                  </p>
+            <button
+              type="button"
+              disabled={isSaving}
+              className={cn(
+                'flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-5 py-9 text-center transition-colors disabled:cursor-wait',
+                isDragging
+                  ? 'border-primary bg-primary/[0.06]'
+                  : 'border-border bg-muted/20 hover:border-primary/50 hover:bg-primary/[0.03] disabled:hover:border-border disabled:hover:bg-muted/20',
+              )}
+              onClick={() => inputRef.current?.click()}
+              onDragLeave={() => setIsDragging(false)}
+              onDragOver={(event) => {
+                event.preventDefault()
+                if (!isSaving) setIsDragging(true)
+              }}
+              onDrop={handleDrop}
+            >
+              <span className="grid size-12 place-items-center rounded-2xl bg-background text-primary shadow-sm ring-1 ring-border">
+                {isSaving ? <Loader2 className="size-5 animate-spin" /> : <Upload className="size-5" />}
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  {isSaving
+                    ? `Uploading ${file?.name ?? 'image'}…`
+                    : hasUploadedImage
+                      ? 'Choose a replacement image'
+                      : 'Choose the panel image'}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {isSaving
+                    ? `Saving${progress ? ` ${progress}%` : ''} — it goes live when this finishes`
+                    : 'Drag a file here or click to browse — it uploads straight away'}
+                </p>
+                {!isSaving ? (
                   <p className="mt-1.5 text-[11px] text-muted-foreground">
                     PNG, JPG, WEBP, AVIF, or SVG · up to 15 MB · a tall photo looks best
                   </p>
-                </div>
-              </button>
-            )}
+                ) : null}
+              </div>
+            </button>
 
             {fileError ? (
               <p role="alert" className="text-xs font-medium text-destructive">
@@ -352,15 +326,6 @@ function AuthImageManager() {
             ) : null}
 
             <div className="flex flex-wrap items-center gap-2">
-              <Button type="button" disabled={!file || isSaving} onClick={handleSave}>
-                {isSaving ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
-                {isSaving
-                  ? `Uploading${progress ? ` ${progress}%` : ''}…`
-                  : hasUploadedImage
-                    ? 'Replace image'
-                    : 'Upload image'}
-              </Button>
-
               <Button
                 type="button"
                 variant="outline"

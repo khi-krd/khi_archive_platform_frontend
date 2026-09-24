@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { Check, Loader2, RefreshCw, Trash2, Type, Upload, X } from 'lucide-react'
+import { Check, Loader2, RefreshCw, Trash2, Type, Upload } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { FormErrorBox } from '@/components/ui/form-error'
-import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/hooks/use-toast'
 import { formatApiError } from '@/lib/get-error-message'
@@ -28,36 +27,6 @@ import {
 } from '@/services/site-font'
 
 const PREVIEW_STYLE_ID = 'khi-site-font-previews'
-
-function formatBytes(bytes) {
-  if (!bytes) return ''
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`
-}
-
-// Renders sample text in a not-yet-uploaded font file via a blob @font-face,
-// so the admin can see the typeface before committing it.
-function PendingFontPreview({ blobUrl }) {
-  useEffect(() => {
-    if (!blobUrl) return undefined
-    const style = document.createElement('style')
-    style.textContent = `@font-face{font-family:"khi-site-font-pending";src:url("${blobUrl}");font-weight:100 900;font-display:swap}`
-    document.head.appendChild(style)
-    return () => style.remove()
-  }, [blobUrl])
-
-  if (!blobUrl) return null
-  return (
-    <p
-      className="truncate text-lg leading-snug text-foreground/80"
-      style={{ fontFamily: '"khi-site-font-pending", sans-serif' }}
-      dir="auto"
-    >
-      ئەرشیفی KHI — Archive AaGg 123
-    </p>
-  )
-}
 
 // One @font-face per library row so each name renders in its own typeface.
 // The file endpoint is public (/api/guest/**) so a plain CSS url() loads it.
@@ -95,15 +64,12 @@ function FontPreviewStyles({ fonts }) {
 function SiteFontManager() {
   const toast = useToast()
   const inputRef = useRef(null)
-  const previewUrlRef = useRef('')
 
   const [fonts, setFonts] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState(null)
 
   const [file, setFile] = useState(null)
-  const [filePreview, setFilePreview] = useState('')
-  const [fontName, setFontName] = useState('')
   const [fileError, setFileError] = useState('')
   const [isDragging, setIsDragging] = useState(false)
 
@@ -145,37 +111,21 @@ function SiteFontManager() {
 
     return () => {
       cancelled = true
-      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current)
     }
   }, [])
 
-  const setPendingFile = (picked) => {
-    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current)
-    previewUrlRef.current = picked ? URL.createObjectURL(picked) : ''
-    setFile(picked)
-    setFilePreview(previewUrlRef.current)
-    if (picked && !fontName.trim()) {
-      setFontName(picked.name.replace(/\.[^.]+$/, ''))
-    }
-  }
-
+  // Picked = committed: a valid file uploads immediately, no second click.
   const chooseFile = (picked) => {
-    if (!picked) return
+    if (!picked || isSaving) return
     const message = validateFontFile(picked)
     if (message) {
-      setPendingFile(null)
       setFileError(message)
       return
     }
     setFileError('')
     setActionError(null)
-    setPendingFile(picked)
-  }
-
-  const clearFile = () => {
-    setPendingFile(null)
-    setFileError('')
-    if (inputRef.current) inputRef.current.value = ''
+    setFile(picked) // its name labels the drop zone while it uploads
+    handleUpload(picked)
   }
 
   const handleInputChange = (event) => {
@@ -189,15 +139,19 @@ function SiteFontManager() {
     chooseFile(event.dataTransfer?.files?.[0])
   }
 
-  const handleUpload = async () => {
-    if (!file) return
+  const handleUpload = async (picked) => {
+    const upload = picked ?? file
+    if (!upload) return
 
     setIsSaving(true)
     setActionError(null)
     setProgress(0)
 
+    // No separate name field — the library label comes from the file itself.
+    const name = upload.name.replace(/\.[^.]+$/, '')
+
     try {
-      const saved = await uploadSiteFont(file, fontName.trim(), {
+      const saved = await uploadSiteFont(upload, name, {
         onUploadProgress: (event) => {
           if (!event.total) return
           setProgress(Math.round((event.loaded / event.total) * 100))
@@ -208,8 +162,6 @@ function SiteFontManager() {
       // The backend auto-activates the first font — mirror that immediately
       // so this session paints with it without a reload.
       if (saved?.active) setActiveSiteFont(saved)
-      setFontName('')
-      clearFile()
       toast.success('Font uploaded', saved?.active ? 'It is now the active site font.' : 'Activate it when you are ready.')
     } catch (error) {
       setActionError(formatApiError(error, 'Could not upload the font.'))
@@ -217,6 +169,8 @@ function SiteFontManager() {
     } finally {
       setIsSaving(false)
       setProgress(0)
+      setFile(null)
+      if (inputRef.current) inputRef.current.value = ''
     }
   }
 
@@ -352,72 +306,42 @@ function SiteFontManager() {
               </p>
             )}
 
-            {file ? (
-              <div className="space-y-3 rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.04] p-4">
-                <div className="flex items-center gap-3">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-emerald-500/10 text-emerald-700 ring-1 ring-emerald-500/20 dark:text-emerald-300">
-                    <Check className="size-5" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-foreground">{file.name}</p>
-                    <p className="text-xs text-muted-foreground">{formatBytes(file.size)}</p>
-                    <PendingFontPreview blobUrl={filePreview} />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label="Clear the selected file"
-                    disabled={isSaving}
-                    onClick={clearFile}
-                  >
-                    <X className="size-4" />
-                  </Button>
-                </div>
-                <div className="space-y-1.5">
-                  <label htmlFor="site-font-name" className="text-xs font-medium text-foreground">
-                    Font name
-                  </label>
-                  <Input
-                    id="site-font-name"
-                    value={fontName}
-                    onChange={(event) => setFontName(event.target.value)}
-                    placeholder="e.g. Rabar, Vazirmatn"
-                    disabled={isSaving}
-                  />
-                </div>
-              </div>
-            ) : (
-              <button
-                type="button"
-                className={cn(
-                  'flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-5 py-9 text-center transition-colors',
-                  isDragging
-                    ? 'border-primary bg-primary/[0.06]'
-                    : 'border-border bg-muted/20 hover:border-primary/50 hover:bg-primary/[0.03]',
-                )}
-                onClick={() => inputRef.current?.click()}
-                onDragLeave={() => setIsDragging(false)}
-                onDragOver={(event) => {
-                  event.preventDefault()
-                  setIsDragging(true)
-                }}
-                onDrop={handleDrop}
-              >
-                <span className="grid size-12 place-items-center rounded-2xl bg-background text-primary shadow-sm ring-1 ring-border">
-                  <Upload className="size-5" />
-                </span>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Choose a font file</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Drag a file here or click to browse
-                  </p>
+            <button
+              type="button"
+              disabled={isSaving}
+              className={cn(
+                'flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed px-5 py-9 text-center transition-colors disabled:cursor-wait',
+                isDragging
+                  ? 'border-primary bg-primary/[0.06]'
+                  : 'border-border bg-muted/20 hover:border-primary/50 hover:bg-primary/[0.03] disabled:hover:border-border disabled:hover:bg-muted/20',
+              )}
+              onClick={() => inputRef.current?.click()}
+              onDragLeave={() => setIsDragging(false)}
+              onDragOver={(event) => {
+                event.preventDefault()
+                if (!isSaving) setIsDragging(true)
+              }}
+              onDrop={handleDrop}
+            >
+              <span className="grid size-12 place-items-center rounded-2xl bg-background text-primary shadow-sm ring-1 ring-border">
+                {isSaving ? <Loader2 className="size-5 animate-spin" /> : <Upload className="size-5" />}
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  {isSaving ? `Uploading ${file?.name ?? 'font'}…` : 'Choose a font file'}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {isSaving
+                    ? `Saving${progress ? ` ${progress}%` : ''} — it joins the library below`
+                    : 'Drag a file here or click to browse — it uploads straight away'}
+                </p>
+                {!isSaving ? (
                   <p className="mt-1.5 text-[11px] text-muted-foreground">
                     WOFF2, WOFF, TTF, or OTF · up to 20 MB · a variable font covers every weight
                   </p>
-                </div>
-              </button>
-            )}
+                ) : null}
+              </div>
+            </button>
 
             {fileError ? (
               <p role="alert" className="text-xs font-medium text-destructive">
@@ -437,11 +361,6 @@ function SiteFontManager() {
             ) : null}
 
             <div className="flex flex-wrap items-center gap-2">
-              <Button type="button" disabled={!file || isSaving} onClick={handleUpload}>
-                {isSaving ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
-                {isSaving ? `Uploading${progress ? ` ${progress}%` : ''}…` : 'Upload font'}
-              </Button>
-
               <Button type="button" variant="outline" disabled={isLoading || isSaving} onClick={load}>
                 <RefreshCw className="size-4" />
                 Refresh
