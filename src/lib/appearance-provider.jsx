@@ -22,6 +22,7 @@ import {
   writeAppearance,
 } from '@/lib/appearance'
 import { AppearanceContext } from '@/lib/appearance-context.js'
+import { subscribeSiteFont } from '@/lib/site-font'
 
 export function AppearanceProvider({ children }) {
   const [state, setState] = useState(() => readAppearance())
@@ -56,6 +57,13 @@ export function AppearanceProvider({ children }) {
         applyAppearance(next)
       },
     )
+  }, [])
+
+  // The admin-uploaded site font arrives asynchronously (and can flip when
+  // an admin activates a different one). Re-applying the current appearance
+  // re-resolves the font stack with the new face prepended.
+  useEffect(() => {
+    return subscribeSiteFont(() => applyAppearance(stateRef.current))
   }, [])
 
   const update = useCallback((patch) => {

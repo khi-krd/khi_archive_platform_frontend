@@ -21,6 +21,8 @@
 // store holds keys only and the apply pass resolves them. That keeps
 // the persisted blob forward-compatible if the palette is tweaked.
 
+import { withSiteFont } from '@/lib/site-font'
+
 const STORAGE_KEY = 'khi:appearance'
 const SYSTEM_DARK_QUERY = '(prefers-color-scheme: dark)'
 
@@ -194,6 +196,11 @@ export function resolveAppearance(state) {
   const scale = findOrFirst(SCALE_PALETTE, merged.scale)
   const isDark = merged.mode === 'dark' || (merged.mode === 'system' && prefersDark())
   const tones = isDark ? accent.dark : accent.light
+  // The admin-uploaded site font (Admin → Settings → Site font) becomes the
+  // app typeface whenever the user keeps the DEFAULT family — an explicit
+  // pick in the tweaker still wins on staff workspaces. Mirrored in the
+  // index.html boot script.
+  const fontStack = merged.font === DEFAULT_APPEARANCE.font ? withSiteFont(font.stack) : font.stack
   return {
     state: merged,
     isDark,
@@ -204,8 +211,8 @@ export function resolveAppearance(state) {
       '--sidebar-primary': tones.primary,
       '--sidebar-primary-foreground': tones.primaryForeground,
       '--sidebar-ring': tones.ring,
-      '--font-sans': font.stack,
-      '--font-heading': font.stack,
+      '--font-sans': fontStack,
+      '--font-heading': fontStack,
       '--radius': radius.value,
     },
     // Root font-size (the magnifier). Applied directly on <html> rather

@@ -54,6 +54,24 @@
           var radius = RADII[s.radius] || RADII['normal'];
           var scale = SCALES[s.scale] || SCALES['default'];
 
+          // Admin-uploaded site font (lib/site-font.js keeps this record
+          // fresh). When it exists and the user never picked a family, the
+          // uploaded face becomes the app font — mirrors resolveAppearance.
+          try {
+            var siteFont = JSON.parse(localStorage.getItem('khi-site-font') || 'null');
+            if (s.font === 'geist' && siteFont && siteFont.resolvedFileUrl) {
+              fontStack = '"KHI Site Font", ' + fontStack;
+              var sfExt = siteFont.resolvedFileUrl.split(/[?#]/)[0].split('.').pop().toLowerCase();
+              var sfFmt = { woff2: 'woff2', woff: 'woff', ttf: 'truetype', otf: 'opentype' }[sfExt];
+              var sfStyle = document.createElement('style');
+              sfStyle.id = 'khi-site-font-face';
+              sfStyle.textContent = '@font-face{font-family:"KHI Site Font";src:url("' +
+                siteFont.resolvedFileUrl + '")' + (sfFmt ? ' format("' + sfFmt + '")' : '') +
+                ';font-weight:100 900;font-style:normal;font-display:swap}';
+              document.head.appendChild(sfStyle);
+            }
+          } catch (e) {}
+
           var html = document.documentElement;
           html.classList.toggle('dark', isDark);
           html.style.colorScheme = isDark ? 'dark' : 'light';

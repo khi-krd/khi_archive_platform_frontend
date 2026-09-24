@@ -1,6 +1,7 @@
 import { AudioLines, Image as ImageIcon, ScrollText, ShieldCheck, Video } from 'lucide-react'
 
 import { KhiLogo } from '@/components/brand/KhiLogo'
+import { useAuthImageSrc } from '@/hooks/use-auth-image'
 import { cn } from '@/lib/utils'
 import '@/styles/khi-theme.css'
 import '@/styles/khi-auth.css'
@@ -31,37 +32,51 @@ const CHIPS = [
 // The cinematic heritage brand panel (left on desktop). Always the dark-pine
 // night scene with a rising sun — independent of light/dark so it stays
 // striking. RTL Sorani identity, paired with the English form on the right.
+// When an admin uploads a panel image (Admin → Settings → Auth page image)
+// the photo replaces the artwork; the brand copy stays on top over a scrim.
 function BrandPanel() {
+  const imageSrc = useAuthImageSrc()
+
   return (
     <aside className="auth-scene relative hidden min-h-dvh flex-col justify-between p-10 lg:flex xl:p-12" dir="rtl">
-      {/* stars */}
-      <div className="pointer-events-none absolute inset-0">
-        {STARS.map((s, i) => (
-          <i key={i} className="auth-star" style={{ left: `${s.left}%`, top: `${s.top}%`, animationDelay: `${s.delay}s` }} />
-        ))}
-      </div>
+      {imageSrc ? (
+        <>
+          {/* admin-uploaded cover photo + legibility scrim */}
+          <img src={imageSrc} alt="" className="pointer-events-none absolute inset-0 size-full object-cover" draggable="false" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#07120d]/90 via-[#07120d]/30 to-[#07120d]/50" />
+        </>
+      ) : (
+        <>
+          {/* stars */}
+          <div className="pointer-events-none absolute inset-0">
+            {STARS.map((s, i) => (
+              <i key={i} className="auth-star" style={{ left: `${s.left}%`, top: `${s.top}%`, animationDelay: `${s.delay}s` }} />
+            ))}
+          </div>
 
-      {/* sun + rays, just above the ridge */}
-      <div className="pointer-events-none absolute bottom-[20%] left-1/2 w-[clamp(220px,30vw,340px)] -translate-x-1/2">
-        <svg className="auth-sun w-full" viewBox="0 0 200 200" fill="none" stroke="#e7d3a0" strokeWidth="1.1">
-          {RAYS.map((r, i) => (
-            <line key={i} x1={r.x1.toFixed(1)} y1={r.y1.toFixed(1)} x2={r.x2.toFixed(1)} y2={r.y2.toFixed(1)} strokeLinecap="round" opacity=".75" />
-          ))}
-          <circle cx="100" cy="100" r="44" fill="#e7d3a0" opacity=".16" />
-          <circle cx="100" cy="100" r="44" strokeWidth="1.5" opacity=".9" />
-          <circle cx="100" cy="100" r="58" strokeDasharray="2 7" opacity=".5" />
-        </svg>
-      </div>
+          {/* sun + rays, just above the ridge */}
+          <div className="pointer-events-none absolute bottom-[20%] left-1/2 w-[clamp(220px,30vw,340px)] -translate-x-1/2">
+            <svg className="auth-sun w-full" viewBox="0 0 200 200" fill="none" stroke="#e7d3a0" strokeWidth="1.1">
+              {RAYS.map((r, i) => (
+                <line key={i} x1={r.x1.toFixed(1)} y1={r.y1.toFixed(1)} x2={r.x2.toFixed(1)} y2={r.y2.toFixed(1)} strokeLinecap="round" opacity=".75" />
+              ))}
+              <circle cx="100" cy="100" r="44" fill="#e7d3a0" opacity=".16" />
+              <circle cx="100" cy="100" r="44" strokeWidth="1.5" opacity=".9" />
+              <circle cx="100" cy="100" r="58" strokeDasharray="2 7" opacity=".5" />
+            </svg>
+          </div>
 
-      {/* mountain range anchored to the bottom */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[36%]">
-        <svg className="size-full" viewBox="0 0 1440 360" preserveAspectRatio="none">
-          <path fill="#2a4a3c" opacity=".5" d="M0 360 V230 L120 180 L240 220 L360 160 L520 210 L680 150 L840 200 L1000 145 L1160 195 L1300 155 L1440 190 V360 Z" />
-          <path fill="#1d362c" opacity=".85" d="M0 360 V270 L160 215 L300 255 L440 195 L600 250 L780 185 L960 245 L1140 195 L1300 240 L1440 205 V360 Z" />
-          <path fill="none" stroke="#d6b25e" strokeWidth="2.4" strokeLinejoin="round" d="M0 318 L140 262 L280 300 L420 238 L560 292 L700 228 L880 296 L1040 248 L1220 300 L1360 256 L1440 286" />
-          <path fill="#102018" d="M0 360 V330 L140 262 L280 300 L420 238 L560 292 L700 228 L880 296 L1040 248 L1220 300 L1360 256 L1440 286 V360 Z" />
-        </svg>
-      </div>
+          {/* mountain range anchored to the bottom */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[36%]">
+            <svg className="size-full" viewBox="0 0 1440 360" preserveAspectRatio="none">
+              <path fill="#2a4a3c" opacity=".5" d="M0 360 V230 L120 180 L240 220 L360 160 L520 210 L680 150 L840 200 L1000 145 L1160 195 L1300 155 L1440 190 V360 Z" />
+              <path fill="#1d362c" opacity=".85" d="M0 360 V270 L160 215 L300 255 L440 195 L600 250 L780 185 L960 245 L1140 195 L1300 240 L1440 205 V360 Z" />
+              <path fill="none" stroke="#d6b25e" strokeWidth="2.4" strokeLinejoin="round" d="M0 318 L140 262 L280 300 L420 238 L560 292 L700 228 L880 296 L1040 248 L1220 300 L1360 256 L1440 286" />
+              <path fill="#102018" d="M0 360 V330 L140 262 L280 300 L420 238 L560 292 L700 228 L880 296 L1040 248 L1220 300 L1360 256 L1440 286 V360 Z" />
+            </svg>
+          </div>
+        </>
+      )}
 
       {/* ── content (above the scene) ── */}
       <div className="relative z-10 flex items-center gap-3.5 text-right">
