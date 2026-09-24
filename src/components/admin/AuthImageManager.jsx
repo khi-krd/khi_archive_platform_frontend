@@ -39,24 +39,14 @@ function formatBytes(bytes) {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`
 }
 
-// Renders the candidate the way the sign-in page will: full-bleed cover with
-// the dark scrim + brand copy on top, so an admin can judge legibility before
-// committing — a busy or very light image can swallow the overlaid text.
+// Renders the candidate the way the sign-in page will: just the photo,
+// full-bleed — no text or effects are drawn over it.
 function PanelPreview({ src }) {
   return (
     <div className="space-y-2">
       <div className="relative aspect-[4/5] max-h-72 overflow-hidden rounded-2xl border border-border bg-[#0e211a]">
         {src ? (
-          <>
-            <img alt="" className="absolute inset-0 size-full object-cover" src={src} draggable="false" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#07120d]/85 via-[#07120d]/25 to-[#07120d]/45" />
-            <div className="absolute inset-x-0 bottom-0 p-4 text-right" dir="rtl">
-              <p className="text-[11px] font-semibold tracking-wide text-[#e7d3a0]">کۆکراوەی دیجیتاڵی · کەلەپووری کوردی</p>
-              <p className="mt-1 text-lg leading-snug text-[#f6eeda]" style={{ fontFamily: "'Amiri', serif" }}>
-                گەنجینەی زیندووی یادەوەری
-              </p>
-            </div>
-          </>
+          <img alt="" className="absolute inset-0 size-full object-cover" src={src} draggable="false" />
         ) : (
           <div className="grid size-full place-items-center p-6 text-center text-xs text-[#f3ead4]/60">
             No image uploaded — the built-in mountain scene is shown.
