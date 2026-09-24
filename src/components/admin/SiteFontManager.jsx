@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Check, Loader2, RefreshCw, Trash2, Type, Upload } from 'lucide-react'
+import { Check, Loader2, RefreshCw, RotateCcw, Trash2, Type, Upload } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -7,6 +7,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { FormErrorBox } from '@/components/ui/form-error'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/hooks/use-toast'
+import { FONT_PALETTE } from '@/lib/appearance'
 import { formatApiError } from '@/lib/get-error-message'
 import {
   clearActiveSiteFont,
@@ -27,6 +28,10 @@ import {
 } from '@/services/site-font'
 
 const PREVIEW_STYLE_ID = 'khi-site-font-previews'
+
+// What "reset" means: the bundled Geist stack the app shipped with — the
+// same entry the appearance tweaker calls Default.
+const DEFAULT_FONT_STACK = FONT_PALETTE[0].stack
 
 // One @font-face per library row so each name renders in its own typeface.
 // The file endpoint is public (/api/guest/**) so a plain CSS url() loads it.
@@ -80,6 +85,8 @@ function SiteFontManager() {
 
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  const activeFont = fonts.find((f) => f.active) ?? null
 
   const load = async () => {
     setIsLoading(true)
@@ -199,6 +206,26 @@ function SiteFontManager() {
     }
   }
 
+  // The pinned "Default font" row: deactivates whichever custom font is
+  // live, returning every page to the bundled Geist stack.
+  const handleResetDefault = async () => {
+    if (!activeFont) return
+
+    setBusyId('default')
+    setActionError(null)
+    try {
+      await deactivateSiteFont(activeFont.id)
+      setFonts((prev) => prev.map((f) => (f.active ? { ...f, active: false } : f)))
+      clearActiveSiteFont()
+      toast.success('Back to the default font', 'Every page uses the bundled font again.')
+    } catch (error) {
+      setActionError(formatApiError(error, 'Could not reset the font.'))
+      toast.apiError(error, 'Could not reset the font')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
   const handleDelete = async () => {
     if (deleteTarget?.id == null) return
 
@@ -245,9 +272,54 @@ function SiteFontManager() {
 
             <FontPreviewStyles fonts={fonts} />
 
-            {fonts.length ? (
-              <ul className="space-y-2.5">
-                {fonts.map((font) => (
+            <ul className="space-y-2.5">
+              {/* Default row — always first. It is "active" when no custom
+                  font is, and offers the one-tap reset when one is. */}
+              <li
+                className={cn(
+                  'flex flex-wrap items-center gap-3 rounded-2xl border p-4',
+                  activeFont ? 'border-border bg-muted/20' : 'border-primary/50 bg-primary/[0.05]',
+                )}
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                    Default font
+                    <span className="font-normal text-muted-foreground">· bundled with the app</span>
+                    {!activeFont ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+                        <Check className="size-3" />
+                        Active
+                      </span>
+                    ) : null}
+                  </p>
+                  <p
+                    className="mt-1 truncate text-lg leading-snug text-foreground/80"
+                    style={{ fontFamily: DEFAULT_FONT_STACK }}
+                    dir="auto"
+                  >
+                    ئەرشیفی KHI — Archive AaGg 123
+                  </p>
+                </div>
+                {activeFont ? (
+                  <div className="flex shrink-0 items-center gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={busyId != null || isDeleting}
+                      onClick={handleResetDefault}
+                    >
+                      {busyId === 'default' ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <RotateCcw className="size-4" />
+                      )}
+                      Reset to default
+                    </Button>
+                  </div>
+                ) : null}
+              </li>
+
+              {fonts.map((font) => (
                   <li
                     key={font.id}
                     className={cn(
@@ -299,12 +371,13 @@ function SiteFontManager() {
                     </div>
                   </li>
                 ))}
-              </ul>
-            ) : (
-              <p className="rounded-2xl border border-dashed border-border bg-muted/20 p-5 text-center text-sm text-muted-foreground">
-                No fonts uploaded yet — the app uses the bundled font.
+            </ul>
+
+            {!fonts.length ? (
+              <p className="rounded-2xl border border-dashed border-border bg-muted/20 p-4 text-center text-xs text-muted-foreground">
+                No custom fonts yet — upload one below to switch the whole site.
               </p>
-            )}
+            ) : null}
 
             <button
               type="button"
