@@ -130,18 +130,19 @@ function AuthShell({ title, description, children, footer, className }) {
 
       <div className="flex min-h-dvh items-center justify-center px-5 py-10 sm:px-8">
         <div className="w-full max-w-md">
-          {/* compact brand row — shown when the panel is hidden (mobile) */}
+          {/* compact brand row — shown when the panel is hidden (mobile).
+              The page backdrop is always deep pine, so these stay light. */}
           <div className="mb-7 flex items-center gap-3 lg:hidden">
             <KhiLogo className="size-12 shadow-md" priority />
             <div>
-              <b className="block text-xl leading-tight text-foreground" style={amiri}>ئەرشیفی KHI</b>
-              <span className="text-[10px] font-semibold tracking-[0.2em] text-muted-foreground">KHI ARCHIVE PLATFORM</span>
+              <b className="block text-xl leading-tight text-[#f3ead4]" style={amiri}>ئەرشیفی KHI</b>
+              <span className="text-[10px] font-semibold tracking-[0.2em] text-[#e7d3a0]/80">KHI ARCHIVE PLATFORM</span>
             </div>
           </div>
 
           <div
             className={cn(
-              'relative overflow-hidden rounded-3xl border border-border bg-card p-7 shadow-2xl shadow-black/10 sm:p-9 dark:shadow-black/40',
+              'auth-card relative overflow-hidden rounded-3xl border border-border bg-card p-7 shadow-2xl shadow-black/40 sm:p-9',
               className,
             )}
           >
@@ -161,8 +162,8 @@ function AuthShell({ title, description, children, footer, className }) {
             ) : null}
           </div>
 
-          <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-            <ShieldCheck className="size-3.5" />
+          <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-xs text-[#f3ead4]/70">
+            <ShieldCheck className="size-3.5 text-[#e7d3a0]" />
             Secured access · your session stays private
           </p>
         </div>

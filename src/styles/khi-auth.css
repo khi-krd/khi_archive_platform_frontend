@@ -8,20 +8,26 @@
    The forms themselves stay English + LTR so every role can use them.
    ============================================================ */
 
-/* Warm paper page backdrop with soft light wells (deep pine in dark). */
+/* Deep-pine cinematic backdrop — the same night palette the brand panel
+   uses, so the page reads as one composed scene: photo/scene on the left,
+   emerald depth behind the floating card on the right. Always dark,
+   independent of the light/dark theme toggle (like the panel itself). */
 .khi-auth{
   min-height:100dvh;
-  background-color:var(--background);
+  color-scheme:dark;
+  background-color:#0e211a;
   background-image:
-    radial-gradient(1000px 640px at 10% -8%, color-mix(in srgb,#ffffff,#f6eecf 72%) 0, transparent 60%),
-    radial-gradient(820px 560px at 102% 112%, color-mix(in srgb,#ffffff,#efe3c8 70%) 0, transparent 55%);
+    radial-gradient(1150px 720px at 90% -12%, rgba(46,130,88,.38) 0, transparent 56%),
+    radial-gradient(900px 640px at -8% 108%, rgba(25,86,58,.55) 0, transparent 58%),
+    radial-gradient(780px 460px at 55% 118%, rgba(214,178,94,.12) 0, transparent 62%),
+    linear-gradient(158deg,#1d3d2e 0%,#143026 48%,#0e211a 100%);
   background-attachment:fixed;
 }
-.dark .khi-auth{
-  background-image:
-    radial-gradient(1000px 640px at 10% -8%, rgba(33,112,73,.30) 0, transparent 60%),
-    radial-gradient(820px 560px at 102% 112%, rgba(18,63,42,.55) 0, transparent 55%);
-}
+/* The form card keeps its own light/dark skin — re-scope color-scheme so
+   native controls inside it (autofill, scrollbars, date pickers) match the
+   card, not the dark page behind it. */
+.khi-auth .auth-card{color-scheme:light}
+.dark .khi-auth .auth-card{color-scheme:dark}
 
 /* ── Cinematic brand panel (always the dark-pine night scene, like the
    public hero — independent of light/dark so it stays striking). ── */
