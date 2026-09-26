@@ -60,7 +60,12 @@
   font-family:'Vazirmatn',Tahoma,system-ui,sans-serif;
   color:var(--ink);
   -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
+  /* `clip`, not `hidden`: plain hidden still makes .khi-root a scroll
+     container (overflow-y computes to auto), which silently breaks every
+     position:sticky inside it — the navbar and the filter rail were
+     scrolling away with the page instead of staying pinned. clip protects
+     against horizontal overflow without creating a scroll container. */
+  overflow-x:clip;
 
   background:#fff;
 }
