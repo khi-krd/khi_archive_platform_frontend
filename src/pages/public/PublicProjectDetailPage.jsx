@@ -11,7 +11,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   IconAudio, IconVideo, IconText, IconImage, IconLayers, IconPerson,
-  IconCategory, IconCalendar, IconProject,
+  IconProject,
 } from '@/components/khi/icons'
 import { guestProject, guestProjectMedia } from '@/services/guest'
 import { getStaffProject, getStaffProjectMedia } from '@/services/staff-public-catalog'
@@ -103,18 +103,31 @@ function PublicProjectDetailPage() {
   const projectCategories = Array.isArray(project.categories) ? project.categories : []
   const firstCat = projectCategories[0]
   const catName = firstCat ? (typeof firstCat === 'string' ? firstCat : (firstCat.categoryName || firstCat.name || firstCat.categoryCode)) : null
-  const totalMedia = (project.audioCount || 0) + (project.videoCount || 0) + (project.textCount || 0) + (project.imageCount || 0)
+  // Guest DTOs nest tallies under mediaCounts{audios,videos,texts,images};
+  // staff DTOs expose them flat.
+  const mc = project.mediaCounts || {}
+  const countOf = (nested, flat) => Number.isFinite(nested) ? nested : (flat || 0)
+  const audioCount = countOf(mc.audios, project.audioCount)
+  const videoCount = countOf(mc.videos, project.videoCount)
+  const textCount = countOf(mc.texts, project.textCount)
+  const imageCount = countOf(mc.images, project.imageCount)
+  const totalMedia = audioCount + videoCount + textCount + imageCount
 
   const stats = [
-    { icon: IconAudio, label: DETAIL.counts.audio, value: project.audioCount || 0 },
-    { icon: IconVideo, label: DETAIL.counts.video, value: project.videoCount || 0 },
-    { icon: IconText, label: DETAIL.counts.text, value: project.textCount || 0 },
-    { icon: IconImage, label: DETAIL.counts.image, value: project.imageCount || 0 },
+    { icon: IconAudio, label: DETAIL.counts.audio, value: audioCount },
+    { icon: IconVideo, label: DETAIL.counts.video, value: videoCount },
+    { icon: IconText, label: DETAIL.counts.text, value: textCount },
+    { icon: IconImage, label: DETAIL.counts.image, value: imageCount },
   ]
 
-  // Categories have their own section card and the media tally is already in
-  // the stats strip, so only the person link needs a home of its own.
+  // Don't echo the same line twice — many projects carry the category name as
+  // their description, which would render "خواردن / خواردن" under the title.
+  const description = project.description && project.description !== catName && project.description !== title
+    ? project.description
+    : null
+
   const personName = person?.fullName || person?.name
+  const hasMeta = Boolean(personName) || projectCategories.length > 0
 
   return (
     <KhiDetailShell>
@@ -122,7 +135,7 @@ function PublicProjectDetailPage() {
         kind="project"
         title={title}
         subtitle={catName}
-        description={project.description}
+        description={description}
         tags={toList(project.tags)}
         breadcrumb={<KhiBreadcrumb items={[
           { to: '/public', label: DETAIL.home },
@@ -133,22 +146,23 @@ function PublicProjectDetailPage() {
       />
 
       <KhiStatsRow items={stats} />
-      {personName ? (
+      {hasMeta ? (
         <section className="detail-meta-section">
           <div className="detail-meta">
             <KhiMetaPanel title={DETAIL.details}>
-              <KhiMetaRow label={DETAIL.person} value={personName}>
-                <KhiPersonLink person={person} fallbackName={personName} />
-              </KhiMetaRow>
+              {personName ? (
+                <KhiMetaRow label={DETAIL.person} value={personName}>
+                  <KhiPersonLink person={person} fallbackName={personName} />
+                </KhiMetaRow>
+              ) : null}
+              {projectCategories.length > 0 ? (
+                <KhiMetaRow label={DETAIL.categories} value={projectCategories.length.toLocaleString()}>
+                  <KhiCategoryLinks categories={projectCategories} />
+                </KhiMetaRow>
+              ) : null}
             </KhiMetaPanel>
           </div>
         </section>
-      ) : null}
-
-      {projectCategories.length > 0 ? (
-        <KhiSectionCard icon={IconCategory} title={DETAIL.categories} count={projectCategories.length}>
-          <KhiCategoryLinks categories={projectCategories} />
-        </KhiSectionCard>
       ) : null}
 
       <KhiSectionCard icon={IconProject} title={DETAIL.media} count={totalMedia || null}>
