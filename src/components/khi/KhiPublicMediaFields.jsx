@@ -657,6 +657,11 @@ const FIELD_ALIASES = {
   tags: ['tags', 'videoTags'],
 }
 
+// Searchable but never displayed to guests — keywords still power search
+// and related filtering server-side; the ledger hides internal cataloguing
+// terms from public detail pages.
+const GUEST_HIDDEN_FIELDS = new Set(['keywords', 'videoKeywords'])
+
 function objectLabel(value) {
   if (!value || typeof value !== 'object') return ''
   return (
@@ -752,7 +757,7 @@ function KhiPublicMediaFields({ kind, item, full = false }) {
   return (
     <>
       {groups.map((group) => {
-        const fields = group.fields.filter((field) => full || !displayedOutside.has(field))
+        const fields = group.fields.filter((field) => full || (!displayedOutside.has(field) && !GUEST_HIDDEN_FIELDS.has(field)))
         if (!fields.length) return null
         // Resolve every field once — for guests (full=false) an empty/null
         // field never renders, and a group whose fields are all empty

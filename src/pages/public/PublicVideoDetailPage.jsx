@@ -18,10 +18,8 @@ import { guestVideos } from '@/services/guest'
 import { getStaffMediaOne } from '@/services/staff-public-catalog'
 import { usePublicAccess } from '@/hooks/use-public-access'
 import { useAuthedMediaUrl } from '@/hooks/use-authed-media-url'
-import { useHlsFallbackSource } from '@/hooks/use-hls-fallback-source'
 import { decodePublicCode, isEncodedPublicCode, publicDetailPath } from '@/components/public/public-route-id'
 import { resolveMediaUrl } from '@/lib/media-url'
-import { buildHlsPlaylistPath } from '@/lib/hls-source'
 
 function toList(v, cap = 12) {
   if (!v) return []
@@ -67,17 +65,9 @@ function PublicVideoDetailPage() {
   // stream URLs — a plain <video src> can't authenticate, so fetch it as a
   // blob instead (same tradeoff as the admin dashboard: loses native Range
   // seeking, acceptable for a staff preview). Guests keep the fast,
-  // Range-enabled HLS/progressive path unaffected.
+  // Range-enabled progressive stream unaffected.
   const staffVideo = useAuthedMediaUrl(video?.videoFileUrl, { enabled: isStaff })
-  const hlsVideoSrc = !isStaff && video?.videoCode
-    ? resolveMediaUrl(buildHlsPlaylistPath('video', video.videoCode, { guest: true }))
-    : ''
-  const guestPlaybackSrc = useHlsFallbackSource({
-    hlsUrl: hlsVideoSrc,
-    directUrl: directVideoSrc,
-    enabled: !isStaff && Boolean(directVideoSrc),
-  })
-  const playbackSrc = isStaff ? staffVideo.url : guestPlaybackSrc
+  const playbackSrc = isStaff ? staffVideo.url : directVideoSrc
 
   if (loading || error || !video) {
     return <KhiDetailShell loading={loading} error={error} notFound={!video} />

@@ -802,8 +802,8 @@
 .khi-root .detail-actions{display:flex;flex-wrap:wrap;gap:10px}
 .khi-root .detail-btn{display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 20px;border-radius:13px;border:1px solid var(--line-2);background:#fff;color:var(--ink);font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer;text-decoration:none;transition:.18s;white-space:nowrap}
 .khi-root .detail-btn:hover{border-color:var(--pine-2);background:var(--paper-3)}
-.khi-root .detail-btn.primary{border:0;background:linear-gradient(145deg,var(--pine-2),var(--pine));color:var(--cream);box-shadow:0 14px 28px -12px rgba(25,86,58,.5)}
-.khi-root .detail-btn.primary:hover{background:linear-gradient(145deg,var(--pine),var(--pine-deep))}
+.khi-root .detail-btn.primary{border:0;background:var(--pine);color:#fff;box-shadow:0 14px 28px -14px rgba(25,86,58,.55)}
+.khi-root .detail-btn.primary:hover{background:var(--pine-2)}
 .khi-root .detail-btn svg{flex-shrink:0}
 
 /* ── Media detail — media-first layout ────────────────────────────────────── */
@@ -1127,7 +1127,7 @@
 @media(max-width:640px){.khi-root .section-card{padding:20px}}
 .khi-root .section-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px;flex-wrap:wrap}
 .khi-root .section-title{display:flex;align-items:center;gap:12px;min-width:0}
-.khi-root .section-ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,var(--pine-2),var(--pine));color:var(--gold-bright);flex-shrink:0}
+.khi-root .section-ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,var(--pine-2),var(--pine));color:#fff;flex-shrink:0}
 .khi-root .section-title h3{margin:0;font-family:'Amiri',serif;font-size:24px;font-weight:700;color:var(--ink)}
 .khi-root .count-badge{min-width:30px;height:30px;padding:0 8px;border-radius:999px;display:grid;place-items:center;background:var(--paper-3);color:var(--gold);font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;direction:ltr}
 .khi-root .see-all-btn{display:inline-flex;align-items:center;gap:8px;color:var(--pine);font-weight:800;font-size:14px;text-decoration:none}
@@ -1637,15 +1637,15 @@
 
 /* ── Detail pages: gilded pills, icons, stages + content flourishes ── */
 .khi-root .type-pill{background:linear-gradient(145deg,#fffdf4,#f9efd8);border-color:rgba(214,178,94,.55);box-shadow:0 6px 14px -10px rgba(150,110,40,.5),inset 0 1px 0 rgba(255,255,255,.7)}
-.khi-root .section-ic{border:1px solid rgba(214,178,94,.35);box-shadow:0 10px 20px -14px rgba(25,86,58,.8)}
+.khi-root .section-ic{border:1px solid rgba(33,112,73,.28);box-shadow:0 10px 20px -14px rgba(25,86,58,.8)}
 .khi-root .content-title{padding-bottom:12px;border-bottom:1px solid var(--line);position:relative}
-.khi-root .content-title::after{content:"";position:absolute;bottom:-1px;inset-inline-start:0;width:64px;height:2px;border-radius:2px;background:linear-gradient(to left,var(--gold-bright),transparent)}
-.khi-root .media-stage{border-radius:22px;box-shadow:0 30px 70px -38px rgba(12,44,29,.75),0 0 0 1px rgba(214,178,94,.14)}
+.khi-root .content-title::after{content:"";position:absolute;bottom:-1px;inset-inline-start:0;width:64px;height:2px;border-radius:2px;background:linear-gradient(to left,var(--pine-2),transparent)}
+.khi-root .media-stage{border-radius:22px;box-shadow:0 30px 70px -38px rgba(12,44,29,.75)}
 .khi-root .detail-btn{transition:transform .2s,box-shadow .2s,border-color .2s,background .2s}
 .khi-root .detail-btn:hover{transform:translateY(-1px)}
-.khi-root .detail-btn.primary{border:1px solid rgba(214,178,94,.4);box-shadow:0 16px 30px -14px rgba(25,86,58,.55),inset 0 1px 0 rgba(214,178,94,.35)}
-.khi-root .meta-panel::before{background:linear-gradient(to left,var(--gold-bright),var(--pine-2) 60%,transparent)}
-.khi-root .mic-badge{border:1px solid rgba(214,178,94,.4)}
+.khi-root .detail-btn.primary{box-shadow:0 16px 30px -14px rgba(25,86,58,.55)}
+.khi-root .meta-panel::before{background:var(--pine-2)}
+.khi-root .mic-badge{border:1px solid rgba(33,112,73,.35)}
 
 /* ── Reduced motion for everything the refinement pass added ── */
 @media (prefers-reduced-motion: reduce){
@@ -1697,7 +1697,7 @@
    with a short solid gold tick and fades away across the row. No section
    number, no Latin accent (user rules). */
 .khi-root .meta-panel-title{display:flex;flex-wrap:nowrap;align-items:center;gap:16px;min-height:0;margin:0;padding:0 2px 12px;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--ink)}
-.khi-root .meta-panel-title::after{content:"";flex:1 1 40px;min-width:28px;height:1px;background:linear-gradient(to left,var(--gold) 0 7px,rgba(176,136,51,.45) 7px,rgba(176,136,51,.04))}
+.khi-root .meta-panel-title::after{content:"";flex:1 1 40px;min-width:28px;height:1px;background:linear-gradient(to left,var(--pine-2) 0 7px,rgba(33,112,73,.4) 7px,rgba(33,112,73,.04))}
 .khi-root .meta-panel-title-local{display:inline;gap:0;color:var(--ink);font-family:'Amiri','Vazirmatn',serif;font-size:20.5px;font-weight:700;line-height:1.5}
 .khi-root .meta-panel-title-local::after{content:none}
 
@@ -1710,7 +1710,7 @@
 .khi-root .meta-panel:not(.media-field-group) .meta-rows{display:grid;grid-auto-flow:dense;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(34px,4.5vw,72px);padding:0}
 .khi-root .meta-panel .meta-row,
 .khi-root .media-field-group .meta-row{display:grid;grid-template-columns:minmax(0,max-content) minmax(0,1fr);align-items:baseline;gap:3px 13px;padding:9px 11px 8px;border:0;border-bottom:1px solid rgba(25,86,58,.06);border-radius:10px;background:transparent;min-height:0;overflow:visible;transition:background-color .18s}
-@media (hover:hover){.khi-root .meta-panel .meta-row:hover{background:rgba(176,136,51,.055)}}
+@media (hover:hover){.khi-root .meta-panel .meta-row:hover{background:rgba(25,86,58,.05)}}
 .khi-root .meta-panel .meta-row dt,
 .khi-root .media-field-group .meta-row dt{max-width:none;padding:0;color:var(--ink-muted);font-size:14px;font-weight:650;line-height:1.65;transition:color .18s}
 @media (hover:hover){.khi-root .meta-panel .meta-row:hover dt{color:var(--ink-soft)}}
@@ -1719,7 +1719,7 @@
 /* long prose stacks: label above, the text under a soft gold quote-bar */
 .khi-root .media-field-group .meta-row.is-long{grid-column:1/-1;grid-template-columns:minmax(0,1fr);gap:7px;padding:12px 11px 11px}
 .khi-root .media-field-group .meta-row.is-long dt{padding-top:0;max-width:none}
-.khi-root .media-field-group .meta-row.is-long dd{padding-inline-start:14px;border-inline-start:2px solid rgba(176,136,51,.3);font-size:14px;font-weight:600;line-height:2}
+.khi-root .media-field-group .meta-row.is-long dd{padding-inline-start:14px;border-inline-start:2px solid rgba(33,112,73,.32);font-size:14px;font-weight:600;line-height:2}
 /* empty rows compress and hush so a full staff ledger stays short */
 .khi-root .media-field-group .meta-row.is-empty-value{grid-column:auto;grid-template-columns:minmax(0,max-content) minmax(0,1fr);align-items:baseline;gap:3px 13px;padding-block:6px 5px;opacity:.48}
 .khi-root .media-field-group .meta-row.is-empty-value dd{padding-inline-start:0;border-inline-start:0;font-size:12.5px;font-weight:600;line-height:1.7}
@@ -1731,10 +1731,10 @@
 .khi-root .full-field-empty{font-family:'IBM Plex Mono',monospace}
 /* multi-value pills sit flush at the value end, soft paper chips */
 .khi-root .meta-row dd .full-field-pills{gap:6px}
-.khi-root .meta-row dd .full-field-pill{border-color:rgba(176,136,51,.28);background:#fffdf6;padding:3px 10px;font-size:12px}
-/* linked values (project/person/category) — gold-outlined chips */
-.khi-root .meta-row dd .entity-chip{padding:3px 13px;border-color:rgba(176,136,51,.55);background:transparent;color:var(--gold);font-weight:800;transition:border-color .18s,color .18s,background .18s}
-@media (hover:hover){.khi-root .meta-row dd .entity-chip:hover{border-color:var(--gold);background:#fffdf6;color:var(--pine)}}
+.khi-root .meta-row dd .full-field-pill{border-color:var(--line);background:#fff;padding:3px 10px;font-size:12px}
+/* linked values (project/person/category) — pine-outlined chips */
+.khi-root .meta-row dd .entity-chip{padding:3px 13px;border-color:rgba(33,112,73,.45);background:transparent;color:var(--pine);font-weight:800;transition:border-color .18s,color .18s,background .18s}
+@media (hover:hover){.khi-root .meta-row dd .entity-chip:hover{border-color:var(--pine);background:#f4f8f5;color:var(--pine-deep)}}
 /* `.ec-label`'s overflow:hidden makes the chip a scroll container, whose
    baseline is synthesized from its BOTTOM edge — inside a baseline-aligned
    row that floats the chip ~7px above the label. Let it wrap instead. */
@@ -1760,7 +1760,7 @@
 .khi-root .detail-year-foot{display:flex;align-items:baseline;justify-content:center;gap:16px;margin:46px auto 6px;padding-top:24px;border-top:1px solid var(--line);max-width:520px}
 .khi-root .detail-year-foot .dyf-label{color:var(--ink-muted);font-size:14px;font-weight:700}
 .khi-root .detail-year-foot .dyf-value{color:var(--pine);font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:700;direction:ltr;letter-spacing:.04em}
-.khi-root .detail-year-foot .dyf-value::after{content:"";display:block;height:3px;margin-top:8px;border-radius:3px;background:linear-gradient(90deg,var(--gold-bright),rgba(214,178,94,.15))}
+.khi-root .detail-year-foot .dyf-value::after{content:"";display:block;height:3px;margin-top:8px;border-radius:3px;background:linear-gradient(90deg,var(--pine-2),rgba(33,112,73,.12))}
 
 /* ============================================================
    CATALOGUE + DETAIL REFRESH — 2026-07, pass 2.

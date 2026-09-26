@@ -18,10 +18,8 @@ import { guestAudios } from '@/services/guest'
 import { getStaffMediaOne } from '@/services/staff-public-catalog'
 import { usePublicAccess } from '@/hooks/use-public-access'
 import { useAuthedMediaUrl } from '@/hooks/use-authed-media-url'
-import { useHlsFallbackSource } from '@/hooks/use-hls-fallback-source'
 import { decodePublicCode, isEncodedPublicCode, publicDetailPath } from '@/components/public/public-route-id'
 import { resolveMediaUrl } from '@/lib/media-url'
-import { buildHlsPlaylistPath } from '@/lib/hls-source'
 
 // Normalise a list-ish value (array | comma/semicolon/Arabic-comma string).
 function toList(v, cap = 12) {
@@ -68,17 +66,9 @@ function PublicAudioDetailPage() {
   // stream URLs — a plain <audio src> can't authenticate, so fetch it as a
   // blob instead (same tradeoff as the admin dashboard: loses native Range
   // seeking, acceptable for a staff preview). Guests keep the fast,
-  // Range-enabled HLS/progressive path unaffected.
+  // Range-enabled progressive stream unaffected.
   const staffAudio = useAuthedMediaUrl(audio?.audioFileUrl, { enabled: isStaff })
-  const hlsAudioSrc = !isStaff && audio?.audioCode
-    ? resolveMediaUrl(buildHlsPlaylistPath('audio', audio.audioCode, { guest: true }))
-    : ''
-  const guestPlaybackSrc = useHlsFallbackSource({
-    hlsUrl: hlsAudioSrc,
-    directUrl: directAudioSrc,
-    enabled: !isStaff && Boolean(directAudioSrc),
-  })
-  const playbackSrc = isStaff ? staffAudio.url : guestPlaybackSrc
+  const playbackSrc = isStaff ? staffAudio.url : directAudioSrc
 
   if (loading || error || !audio) {
     return <KhiDetailShell loading={loading} error={error} notFound={!audio} />
