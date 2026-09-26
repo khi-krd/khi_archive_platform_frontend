@@ -75,7 +75,7 @@ function PublicAudioDetailPage() {
   }
 
   const title = pickMediaTitle(audio) || DETAIL.none
-  const originalCandidate = audio.originTitle || audio.titleOriginal || audio.centralKurdishTitle || audio.titleInCentralKurdish
+  const originalCandidate = audio.originTitle || audio.titleOriginal || audio.originalTitle || audio.alternativeTitle || audio.alterTitle || audio.romanizedTitle
   const original = originalCandidate && originalCandidate !== title ? originalCandidate : null
   const projectCode = audio.project?.projectCode || audio.projectCode
 

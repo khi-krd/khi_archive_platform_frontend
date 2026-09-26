@@ -98,7 +98,7 @@ const ENTITIES = {
       'This permanently deletes the audio record and removes the file from S3. This cannot be undone.',
     project: (r) => ({
       code: r.audioCode,
-      title: r.originTitle || r.alterTitle || r.fileName || r.audioCode,
+      title: r.centralKurdishTitle || r.titleInCentralKurdish || r.originTitle || r.alterTitle || r.audioCode,
       subtitle: r.projectName || r.projectCode || null,
     }),
   },
@@ -112,7 +112,7 @@ const ENTITIES = {
       'This permanently deletes the video record and removes the file from S3. This cannot be undone.',
     project: (r) => ({
       code: r.videoCode,
-      title: r.originalTitle || r.alternativeTitle || r.fileName || r.videoCode,
+      title: r.titleInCentralKurdish || r.centralKurdishTitle || r.originalTitle || r.alternativeTitle || r.videoCode,
       subtitle: r.projectName || r.projectCode || null,
     }),
   },
@@ -126,7 +126,7 @@ const ENTITIES = {
       'This permanently deletes the image record and removes the file from S3. This cannot be undone.',
     project: (r) => ({
       code: r.imageCode,
-      title: r.originalTitle || r.alternativeTitle || r.fileName || r.imageCode,
+      title: r.titleInCentralKurdish || r.centralKurdishTitle || r.originalTitle || r.alternativeTitle || r.imageCode,
       subtitle: r.projectName || r.projectCode || null,
     }),
   },
@@ -140,7 +140,7 @@ const ENTITIES = {
       'This permanently deletes the text record and removes the file from S3. This cannot be undone.',
     project: (r) => ({
       code: r.textCode,
-      title: r.originalTitle || r.alternativeTitle || r.fileName || r.textCode,
+      title: r.titleInCentralKurdish || r.centralKurdishTitle || r.originalTitle || r.alternativeTitle || r.textCode,
       subtitle: r.projectName || r.projectCode || null,
     }),
   },

@@ -74,7 +74,7 @@ function PublicVideoDetailPage() {
   }
 
   const title = pickMediaTitle(video) || DETAIL.none
-  const originalCandidate = video.originalTitle || video.titleOriginal || video.titleInCentralKurdish || video.centralKurdishTitle
+  const originalCandidate = video.originalTitle || video.originTitle || video.titleOriginal || video.alternativeTitle || video.alterTitle || video.romanizedTitle
   const original = originalCandidate && originalCandidate !== title ? originalCandidate : null
   const projectCode = video.project?.projectCode || video.projectCode
 

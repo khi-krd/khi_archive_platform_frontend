@@ -1,29 +1,28 @@
 import React from 'react'
 import useGuestFeed from '@/hooks/use-guest-feed'
+import { pickMediaTitle } from '@/components/public/public-helpers'
 
 function normalizeFeedCard(kind, item) {
   const cfg = {
     image: {
       code: item.imageCode || item.code,
-      title: item.originalTitle || item.alternativeTitle || item.title || item.romanizedTitle,
       fileUrl: item.imageFileUrl || item.fileUrl,
     },
     audio: {
       code: item.audioCode || item.code,
-      title: item.originalTitle || item.alterTitle || item.title || item.romanizedTitle,
       fileUrl: item.audioFileUrl || item.fileUrl,
     },
     video: {
       code: item.videoCode || item.code,
-      title: item.originalTitle || item.alternativeTitle || item.title || item.romanizedTitle,
       fileUrl: item.videoFileUrl || item.fileUrl,
     },
     text: {
       code: item.textCode || item.code,
-      title: item.originalTitle || item.alternativeTitle || item.title || item.romanizedTitle,
       fileUrl: item.textFileUrl || item.fileUrl,
     },
   }[kind]
+  if (!cfg) return { kind, item }
+  cfg.title = pickMediaTitle(item)
 
   return { kind, ...cfg, item }
 }

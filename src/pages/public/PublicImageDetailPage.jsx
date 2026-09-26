@@ -78,7 +78,7 @@ function PublicImageDetailPage() {
   }
 
   const title = pickMediaTitle(image) || DETAIL.none
-  const originalCandidate = image.originalTitle || image.titleOriginal || image.titleInCentralKurdish || image.centralKurdishTitle
+  const originalCandidate = image.originalTitle || image.originTitle || image.titleOriginal || image.alternativeTitle || image.alterTitle || image.romanizedTitle
   const original = originalCandidate && originalCandidate !== title ? originalCandidate : null
   const fileUrl = isStaff ? staffImage.url : resolveMediaUrl(image.imageFileUrl)
   const projectCode = image.project?.projectCode || image.projectCode

@@ -2138,7 +2138,7 @@ function EmployeeProjectDetailPage() {
                       {currentImagePreview.url ? (
                         <img
                           src={currentImagePreview.url}
-                          alt={currentImage.originalTitle || currentImage.imageCode}
+                          alt={currentImage.titleInCentralKurdish || currentImage.centralKurdishTitle || currentImage.originalTitle || currentImage.imageCode}
                           className="block max-h-72 w-auto max-w-full object-contain"
                         />
                       ) : (
@@ -2589,7 +2589,7 @@ function EmployeeProjectDetailPage() {
                     {currentVideoPreview.url ? (
                       <VideoPlayer
                         src={currentVideoPreview.url}
-                        title={currentVideo.originalTitle || currentVideo.videoCode}
+                        title={currentVideo.titleInCentralKurdish || currentVideo.centralKurdishTitle || currentVideo.originalTitle || currentVideo.videoCode}
                         subtitle={[currentVideo.videoVersion, currentVideo.extension, currentVideo.resolution]
                           .filter(Boolean)
                           .join(' • ')}
@@ -3394,10 +3394,11 @@ function EmployeeProjectDetailPage() {
               ) : (
                 filteredAudios.map((audio, index) => {
                   const title =
+                    audio.centralKurdishTitle ||
+                    audio.titleInCentralKurdish ||
                     audio.originTitle ||
                     audio.alterTitle ||
                     audio.romanizedTitle ||
-                    audio.fileName ||
                     audio.audioCode
                   return (
                     <TableRow
@@ -3803,10 +3804,11 @@ function VideoListSection({ isLoading, videos, filteredVideos, searchQuery, filt
           ) : (
             filteredVideos.map((video, index) => {
               const title =
+                video.titleInCentralKurdish ||
+                video.centralKurdishTitle ||
                 video.originalTitle ||
                 video.alternativeTitle ||
                 video.romanizedTitle ||
-                video.fileName ||
                 video.videoCode
               const genres = Array.isArray(video.genre) ? video.genre : video.genre ? [video.genre] : []
               const visibleGenres = genres.slice(0, 2)
@@ -4020,10 +4022,11 @@ function ImageListSection({ isLoading, images, filteredImages, searchQuery, filt
           ) : (
             filteredImages.map((image, index) => {
               const title =
+                image.titleInCentralKurdish ||
+                image.centralKurdishTitle ||
                 image.originalTitle ||
                 image.alternativeTitle ||
                 image.romanizedTitle ||
-                image.fileName ||
                 image.imageCode
               const genres = Array.isArray(image.genre) ? image.genre : image.genre ? [image.genre] : []
               const visibleGenres = genres.slice(0, 2)
@@ -4217,10 +4220,11 @@ function TextListSection({ isLoading, texts, filteredTexts, searchQuery, filters
           ) : (
             filteredTexts.map((text, index) => {
               const title =
+                text.titleInCentralKurdish ||
+                text.centralKurdishTitle ||
                 text.originalTitle ||
                 text.alternativeTitle ||
                 text.romanizedTitle ||
-                text.fileName ||
                 text.textCode
               const genres = Array.isArray(text.genre) ? text.genre : text.genre ? [text.genre] : []
               const visibleGenres = genres.slice(0, 2)

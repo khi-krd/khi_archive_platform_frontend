@@ -21,21 +21,16 @@ function cleanTitleValue(value) {
 }
 
 // Returns the most-readable title for any media DTO regardless of which
-// of the backend's title field names it actually carries. The backend
-// uses different names per kind (audio uses originTitle / alterTitle,
-// video uses originalTitle / alternativeTitle, all four use fileName,
-// and feed/search rows can expose a normalised `title`).
-// Reading them all here means every detail page, card, and breadcrumb
-// gets a consistent best-available title and never falls
-// through to the technical code on a record that has titles set under
-// a name we forgot to check.
+// of the backend's title field names it actually carries. The catalogue
+// rule: the Central Kurdish title is THE title — the secondary title
+// fields (origin/original, alternative, romanized) only fill in when no
+// Kurdish title exists. `fileName` is never a title — it is deliberately
+// absent from the chain, so an untitled record falls back to its record
+// code instead of leaking an upload filename.
 function pickMediaTitle(item) {
   if (!item) return null
   return (
     pickFirst(
-      // Public catalogue rule: Central Kurdish first. English / romanized
-      // titles are dashboard context and only fall back when no Kurdish title
-      // exists in the DTO.
       cleanTitleValue(item.centralKurdishTitle),
       cleanTitleValue(item.titleInCentralKurdish),
       cleanTitleValue(item.titleCentralKurdish),
@@ -43,12 +38,11 @@ function pickMediaTitle(item) {
       cleanTitleValue(item.originalTitle),
       cleanTitleValue(item.originTitle),
       cleanTitleValue(item.titleOriginal),
-      cleanTitleValue(item.fileName),
       cleanTitleValue(item.alternativeTitle),
       cleanTitleValue(item.alterTitle),
-      cleanTitleValue(item.title),
-      cleanTitleValue(item.titleEnglish),
       cleanTitleValue(item.romanizedTitle),
+      cleanTitleValue(item.titleEnglish),
+      cleanTitleValue(item.title),
     ) || null
   )
 }

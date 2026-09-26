@@ -40,10 +40,10 @@ export async function guestSuggest({ q, limit, signal } = {}) {
   const definitions = [
     ['person', 'persons', ['fullName', 'personName', 'name', 'title'], ['personCode', 'code']],
     ['project', 'projects', ['projectName', 'name', 'title'], ['projectCode', 'code']],
-    ['audio', 'audios', ['centralKurdishTitle', 'originTitle', 'originalTitle', 'title', 'fileName'], ['audioCode', 'code']],
-    ['video', 'videos', ['titleInCentralKurdish', 'originalTitle', 'title', 'fileName'], ['videoCode', 'code']],
-    ['text', 'texts', ['titleInCentralKurdish', 'originalTitle', 'title', 'fileName'], ['textCode', 'code']],
-    ['image', 'images', ['titleInCentralKurdish', 'originalTitle', 'title', 'fileName'], ['imageCode', 'code']],
+    ['audio', 'audios', ['centralKurdishTitle', 'titleInCentralKurdish', 'originTitle', 'originalTitle', 'title'], ['audioCode', 'code']],
+    ['video', 'videos', ['titleInCentralKurdish', 'centralKurdishTitle', 'originalTitle', 'title'], ['videoCode', 'code']],
+    ['text', 'texts', ['titleInCentralKurdish', 'centralKurdishTitle', 'originalTitle', 'title'], ['textCode', 'code']],
+    ['image', 'images', ['titleInCentralKurdish', 'centralKurdishTitle', 'originalTitle', 'title'], ['imageCode', 'code']],
     ['category', 'categories', ['categoryName', 'name', 'title'], ['categoryCode', 'code']],
   ]
   const first = (item, keys) => keys.map((key) => item?.[key]).find((value) => value != null && value !== '')

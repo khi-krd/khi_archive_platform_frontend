@@ -224,8 +224,9 @@ function matchesMediaFilters(row, params) {
 
 function titleOf(row) {
   return (
-    row?.title || row?.centralKurdishTitle || row?.titleInCentralKurdish ||
-    row?.originalTitle || row?.originTitle || row?.fileName || row?.code || ''
+    row?.centralKurdishTitle || row?.titleInCentralKurdish ||
+    row?.originalTitle || row?.originTitle || row?.alternativeTitle ||
+    row?.alterTitle || row?.romanizedTitle || row?.title || row?.code || ''
   )
 }
 

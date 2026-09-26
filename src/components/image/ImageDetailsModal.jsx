@@ -125,11 +125,11 @@ function ImageDetailsModal({ image, open, onOpenChange, searchQuery }) {
   if (!open || !image) return null
 
   const title =
+    image.titleInCentralKurdish ||
+    image.centralKurdishTitle ||
     image.originalTitle ||
     image.alternativeTitle ||
-    image.titleInCentralKurdish ||
     image.romanizedTitle ||
-    image.fileName ||
     image.imageCode
 
   const projectChip = image.projectCode
@@ -139,7 +139,7 @@ function ImageDetailsModal({ image, open, onOpenChange, searchQuery }) {
     ? { label: image.personName || image.personCode, code: image.personCode }
     : null
 
-  const hasTitles = hasAny(image, ['originalTitle', 'alternativeTitle', 'titleInCentralKurdish', 'romanizedTitle', 'fileName'])
+  const hasTitles = hasAny(image, ['originalTitle', 'alternativeTitle', 'titleInCentralKurdish', 'centralKurdishTitle', 'romanizedTitle'])
   const hasClassification = hasAny(image, ['subject', 'genre', 'event', 'location', 'description', 'form'])
   const hasImageMeta = hasAny(image, ['personShownInImage', 'colorOfImage', 'whereThisImageUsed', 'imageVersion', 'versionNumber', 'copyNumber'])
   const hasEquipment = hasAny(image, ['manufacturer', 'model', 'lens'])

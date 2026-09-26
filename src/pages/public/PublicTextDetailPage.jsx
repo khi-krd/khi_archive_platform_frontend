@@ -361,7 +361,7 @@ function PublicTextDetailPage() {
   }
 
   const title = pickMediaTitle(text) || DETAIL.none
-  const originalCandidate = text.originalTitle || text.titleOriginal || text.titleInCentralKurdish || text.centralKurdishTitle
+  const originalCandidate = text.originalTitle || text.originTitle || text.titleOriginal || text.alternativeTitle || text.alterTitle || text.romanizedTitle
   const original = originalCandidate && originalCandidate !== title ? originalCandidate : null
   const fileUrl = resolveMediaUrl(text.textFileUrl)
   // Classify by the stored extension/file name — the `/stream` URL usually

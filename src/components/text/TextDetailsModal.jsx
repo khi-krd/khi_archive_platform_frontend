@@ -169,11 +169,11 @@ function TextDetailsModal({ text, open, onOpenChange, searchQuery }) {
   if (!open || !text) return null
 
   const title =
+    text.titleInCentralKurdish ||
+    text.centralKurdishTitle ||
     text.originalTitle ||
     text.alternativeTitle ||
-    text.titleInCentralKurdish ||
     text.romanizedTitle ||
-    text.fileName ||
     text.textCode
 
   const projectChip = text.projectCode
@@ -183,7 +183,7 @@ function TextDetailsModal({ text, open, onOpenChange, searchQuery }) {
     ? { label: text.personName || text.personCode, code: text.personCode }
     : null
 
-  const hasTitles = hasAny(text, ['originalTitle', 'alternativeTitle', 'titleInCentralKurdish', 'romanizedTitle', 'fileName'])
+  const hasTitles = hasAny(text, ['originalTitle', 'alternativeTitle', 'titleInCentralKurdish', 'centralKurdishTitle', 'romanizedTitle'])
   const hasClassification = hasAny(text, ['subject', 'genre', 'documentType', 'description'])
   const hasTextDetails = hasAny(text, [
     'script', 'isbn', 'assignmentNumber', 'edition', 'volume', 'series',

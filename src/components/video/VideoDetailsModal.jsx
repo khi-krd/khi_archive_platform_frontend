@@ -100,11 +100,11 @@ function VideoDetailsModal({ video, open, onOpenChange, searchQuery }) {
   if (!open || !video) return null
 
   const title =
+    video.titleInCentralKurdish ||
+    video.centralKurdishTitle ||
     video.originalTitle ||
     video.alternativeTitle ||
-    video.titleInCentralKurdish ||
     video.romanizedTitle ||
-    video.fileName ||
     video.videoCode
 
   const projectChip = video.projectCode
@@ -114,7 +114,7 @@ function VideoDetailsModal({ video, open, onOpenChange, searchQuery }) {
     ? { label: video.personName || video.personCode, code: video.personCode }
     : null
 
-  const hasTitles = hasAny(video, ['originalTitle', 'alternativeTitle', 'titleInCentralKurdish', 'romanizedTitle', 'fileName'])
+  const hasTitles = hasAny(video, ['originalTitle', 'alternativeTitle', 'titleInCentralKurdish', 'centralKurdishTitle', 'romanizedTitle'])
   const hasClassification = hasAny(video, ['subject', 'genre', 'event', 'location', 'description'])
   const hasVideoMeta = hasAny(video, ['personShownInVideo', 'colorOfVideo', 'whereThisVideoUsed', 'videoVersion', 'versionNumber', 'copyNumber'])
   const hasTechnical = hasAny(video, [
