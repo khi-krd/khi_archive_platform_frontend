@@ -174,12 +174,12 @@
   --popover:#ffffff;
   --popover-foreground:#211d15;
   --primary:#19563a;
-  --primary-foreground:#f6eeda;
+  --primary-foreground:#ffffff;
   --secondary:#f4f7f3;
   --secondary-foreground:#19563a;
   --muted:#f7f9f6;
   --muted-foreground:#687367;
-  --accent:#e7d3a0;
+  --accent:#dcebe1;
   --accent-foreground:#123f2a;
   --destructive:#b4512c;
   --border:#d8e2d7;
@@ -188,7 +188,7 @@
   --sidebar:#ffffff;
   --sidebar-foreground:#211d15;
   --sidebar-primary:#19563a;
-  --sidebar-primary-foreground:#f6eeda;
+  --sidebar-primary-foreground:#ffffff;
   --sidebar-accent:#f4f7f3;
   --sidebar-accent-foreground:#19563a;
   --sidebar-border:#d8e2d7;
@@ -199,27 +199,21 @@
 .khi-help-shell{
   box-shadow:0 50px 110px -34px rgba(12,44,29,.74),0 14px 34px -20px rgba(12,44,29,.4);
 }
-/* Header: warm pine-tinted wash closed by a fine gold hairline. */
+/* Header: clean pine-tinted wash closed by a fine pine hairline. */
 .khi-help-dialog .khi-help-head{
-  background:linear-gradient(180deg, color-mix(in srgb, var(--primary) 12%, var(--card)), var(--card));
-  box-shadow:inset 0 -1px 0 rgba(214,178,94,.5);
+  background:linear-gradient(180deg, color-mix(in srgb, var(--primary) 9%, var(--card)), var(--card));
+  box-shadow:inset 0 -1px 0 rgba(33,112,73,.22);
 }
-/* Brand mark: gilded pine medallion with a soft gold halo. */
-.khi-help-dialog .khi-help-mark{
-  background:linear-gradient(145deg, var(--primary), color-mix(in srgb, var(--primary) 70%, #000));
-  border:1px solid rgba(214,178,94,.6);
-  box-shadow:0 10px 22px -8px color-mix(in srgb, var(--primary) 62%, transparent),0 0 0 4px rgba(214,178,94,.12), inset 0 1px 0 rgba(255,255,255,.25);
-}
-/* Rail: warm paper gradient (a touch of accent) so it reads as a side panel. */
+/* Rail: a faint pine tint so it reads as a side panel. */
 .khi-help-dialog .khi-help-rail{
-  background:linear-gradient(180deg, var(--secondary), color-mix(in srgb, var(--accent) 9%, var(--secondary)));
+  background:linear-gradient(180deg,#f7faf7,#eff5f0);
 }
-/* Current value: an "archive card" — warm paper, gold inner edge, soft lift. */
+/* Current value: an "archive card" — soft pine wash, pine inner edge, soft lift. */
 .khi-help-dialog .khi-help-current{
-  background:linear-gradient(180deg,#fffdf9, var(--secondary));
+  background:linear-gradient(180deg,#fafdfb, var(--secondary));
   border-color:var(--border);
-  border-inline-start:3px solid var(--accent);
-  box-shadow:0 10px 24px -18px rgba(25,86,58,.5), inset 0 1px 0 rgba(255,255,255,.6);
+  border-inline-start:3px solid var(--primary);
+  box-shadow:0 10px 24px -18px rgba(25,86,58,.45), inset 0 1px 0 rgba(255,255,255,.6);
 }
 /* Correction textarea: a calm pine focus glow. */
 .khi-help-dialog .khi-help-textarea:focus{
@@ -244,13 +238,15 @@
   .khi-help-dialog .khi-help-shell{animation:none}
   .khi-help-dialog .khi-help-option:active{transform:none}
 }
-/* Submit: gilded pine — gradient body, gold top sheen + ring, lifting shadow. */
+/* Submit: solid pine with a soft inner sheen — matches the detail-page
+   primary button (no gold trim anywhere). */
 .khi-help-submit:not(:disabled){
-  background:linear-gradient(145deg, var(--primary), color-mix(in srgb, var(--primary) 80%, #000));
-  border:1px solid rgba(214,178,94,.45);
-  box-shadow:0 14px 28px -12px color-mix(in srgb, var(--primary) 68%, transparent), inset 0 1px 0 rgba(214,178,94,.4);
+  background:var(--primary);
+  color:var(--primary-foreground);
+  border:0;
+  box-shadow:0 14px 30px -14px rgba(25,86,58,.6), inset 0 1px 0 rgba(255,255,255,.16);
 }
 .khi-help-submit:not(:disabled):hover{
-  filter:brightness(1.08);
-  box-shadow:0 18px 34px -12px color-mix(in srgb, var(--primary) 72%, transparent), inset 0 1px 0 rgba(214,178,94,.55);
+  background:#217049;
+  box-shadow:0 18px 36px -14px rgba(25,86,58,.65), inset 0 1px 0 rgba(255,255,255,.2);
 }

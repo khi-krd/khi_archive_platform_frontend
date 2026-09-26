@@ -72,14 +72,15 @@ const KU = {
 // ── Section tones ──────────────────────────────────────────────────────────────
 // One accessible hue per section (all ≥ 4.5:1 on the dialog's white card, so the
 // tone can safely tint TEXT as well as the dot). Colour is never the only cue —
-// every section also carries its own icon and its name.
+// every section also carries its own icon and its name. The palette stays in the
+// cool pine/teal/indigo family — no warm golds.
 const TONE = {
   content: '#19563a',
   form: '#5b3f86',
-  people: '#8f5314',
+  people: '#1d5f8f',
   language: '#0f5f57',
-  place: '#9c3b4d',
-  rights: '#7d6117',
+  place: '#8c3b4d',
+  rights: '#7a4b96',
   tags: '#2c6b39',
   document: '#3a4c8c',
 }
@@ -233,7 +234,7 @@ const FIELD_GROUPS = {
 const LONG_FIELDS = ['description', 'transcription', 'lyrics', 'summary', 'bodyText']
 
 const STATUS_META = {
-  PENDING: { tone: '#8a6a1c', label: KU.statusPending },
+  PENDING: { tone: '#64748b', label: KU.statusPending },
   FORWARDED: { tone: '#3a4c8c', label: KU.statusForwarded },
   RESOLVED: { tone: '#2c6b39', label: KU.statusResolved },
   REJECTED: { tone: '#9c3b4d', label: KU.statusRejected },
