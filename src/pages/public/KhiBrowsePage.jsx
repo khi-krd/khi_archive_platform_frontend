@@ -10,7 +10,7 @@ import { usePublicAccess } from '@/hooks/use-public-access'
 import KhiSidebar from '@/components/khi/KhiSidebar'
 import KhiToolbar from '@/components/khi/KhiToolbar'
 import KhiCard from '@/components/khi/KhiCard'
-import { strictPublishedYear, useYearBounds } from '@/components/khi/use-year-bounds'
+import { workYear, useYearBounds } from '@/components/khi/use-year-bounds'
 import { useDataFacets } from '@/components/khi/use-data-facets'
 import { usePublicFilterCounts } from '@/components/khi/use-public-filter-counts'
 import { IconClose } from '@/components/khi/icons'
@@ -148,16 +148,15 @@ async function probeAllMediaBounds(params, staff) {
       ),
     ),
   )
-  // First DATED row per kind — strict datePublished only, so an undated head
-  // row can't hide the true oldest/newest published item behind it.
+  // First DATED row per kind — work year (dateCreated → datePublished →
+  // printDate → createdAt), so an undated head row can't hide the true
+  // oldest/newest item behind it.
   const items = results
-    .map((res) => (res?.content ?? []).find((row) => strictPublishedYear(row) != null))
+    .map((res) => (res?.content ?? []).find((row) => workYear(row) != null))
     .filter(Boolean)
   if (!items.length) return { content: [] }
   const asc = params.sortDirection === 'asc'
-  items.sort((a, b) =>
-    asc ? strictPublishedYear(a) - strictPublishedYear(b) : strictPublishedYear(b) - strictPublishedYear(a),
-  )
+  items.sort((a, b) => (asc ? workYear(a) - workYear(b) : workYear(b) - workYear(a)))
   return { content: [items[0]] }
 }
 

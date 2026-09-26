@@ -201,9 +201,10 @@ function matchesMediaFilters(row, params) {
   const from = params.dateFrom ? dayStartMs(params.dateFrom) : null
   const to = params.dateTo ? dayEndMs(params.dateTo) : null
   if (from || to) {
-    // The public timeline filter is publishment-date semantics: prefer
-    // datePublished, falling back to the archival/created dates.
-    const time = new Date(row.datePublished || rowDate(row)).getTime()
+    // The public timeline filter keys on the work's own date (the year the
+    // card shows): dateCreated first, then datePublished/printDate, then the
+    // record stamp — never the upload timestamp alone.
+    const time = new Date(rowDate(row)).getTime()
     if (!Number.isFinite(time)) return false
     if (from && time < from) return false
     if (to && time > to) return false
@@ -237,12 +238,11 @@ function sortRows(rows, sortBy, direction) {
     if (sortBy === 'title') {
       return String(titleOf(a)).localeCompare(String(titleOf(b)), undefined, { sensitivity: 'base' }) * sign
     }
-    // 'date'/'datePublished' both mean the publishment date here — fall back
-    // to the archival date so undated records stay comparable. Rows with no
-    // usable date land at the far end in both directions.
-    const usePublished = sortBy === 'datePublished' || sortBy === 'date'
-    const aTime = new Date(usePublished ? (a.datePublished || rowDate(a)) : rowDate(a)).getTime()
-    const bTime = new Date(usePublished ? (b.datePublished || rowDate(b)) : rowDate(b)).getTime()
+    // 'date'/'datePublished' both mean the work's own date here — the year the
+    // card displays (dateCreated → datePublished → printDate → createdAt).
+    // Rows with no usable date land at the far end in both directions.
+    const aTime = new Date(rowDate(a)).getTime()
+    const bTime = new Date(rowDate(b)).getTime()
     const aVal = Number.isFinite(aTime) ? aTime : null
     const bVal = Number.isFinite(bTime) ? bTime : null
     if (aVal == null && bVal == null) return 0
