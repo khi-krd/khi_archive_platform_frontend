@@ -359,6 +359,21 @@ export function yearNum(item) {
   return Number.isFinite(n) ? n : null
 }
 
+// The PUBLISHMENT year — datePublished first, content-year fallbacks after.
+// The public catalogue's newest/oldest sort and the timeline filter are
+// publishment-date semantics, so their bounds read from here.
+export function publishedYear(item) {
+  const raw = item?.datePublished
+  if (raw) {
+    const m = String(raw).match(/(\d{4})/)
+    if (m) {
+      const n = Number(m[1])
+      if (Number.isFinite(n)) return n
+    }
+  }
+  return yearNum(item)
+}
+
 function durationOf(item) {
   return (
     item.durationFormatted ||

@@ -6,7 +6,7 @@ import { getText } from '@/services/text'
 import { getProject, getProjectsPage } from '@/services/project'
 import { getCategory, getCategoriesPage } from '@/services/category'
 import { getPerson, getPersonsPage } from '@/services/person'
-import { orderBySharedTag } from '@/lib/tag-order'
+import { orderBySharedTag, orderInterleavedByKind } from '@/lib/tag-order'
 
 const MEDIA_KINDS = ['image', 'audio', 'video', 'text']
 const ENTITY_KINDS = ['project', 'person', 'category']
@@ -201,7 +201,9 @@ function matchesMediaFilters(row, params) {
   const from = params.dateFrom ? dayStartMs(params.dateFrom) : null
   const to = params.dateTo ? dayEndMs(params.dateTo) : null
   if (from || to) {
-    const time = new Date(rowDate(row)).getTime()
+    // The public timeline filter is publishment-date semantics: prefer
+    // datePublished, falling back to the archival/created dates.
+    const time = new Date(row.datePublished || rowDate(row)).getTime()
     if (!Number.isFinite(time)) return false
     if (from && time < from) return false
     if (to && time > to) return false
@@ -252,9 +254,16 @@ function sortRows(rows, sortBy, direction) {
 }
 
 export async function getStaffMediaPage(kinds, params = {}) {
+  const kindList = asArray(kinds)
+  const multi = kindList.length > 1
   const page = Number(params.page) || 0
   const size = Number(params.size) || 50
-  if (!needsClientMediaFiltering(params)) {
+
+  // A single-kind page with only server-supported params can stay paged.
+  // Multi-kind queries can NOT: the classified grid (10-per-kind rounds) and
+  // هاوتاگ's global tag order both need the whole set, so they always take
+  // the client path alongside the client-only sorts/filters.
+  if (!multi && !needsClientMediaFiltering(params)) {
     const data = await getItemsPage(itemRequest(kinds, params, page, size))
     return {
       ...data,
@@ -262,14 +271,27 @@ export async function getStaffMediaPage(kinds, params = {}) {
     }
   }
 
-  const allRows = await fetchAllItemRows(kinds, params)
-  const filtered = sortRows(
-    allRows.filter((row) => matchesMediaFilters(row, params)),
-    params.sortBy,
-    params.sortDirection,
-  )
+  const matches = (row) => matchesMediaFilters(row, params)
+  let ordered
+  if (params.sortBy === 'tag') {
+    const rows = await fetchAllItemRows(kindList, params)
+    ordered = orderBySharedTag(rows.filter(matches))
+  } else if (multi) {
+    // Classified rounds: fetch + sort each kind separately (its list keeps
+    // the requested order), then interleave 10-per-kind — image, audio,
+    // video, text — exactly like the guest grid.
+    const perKind = await Promise.all(kindList.map((k) => fetchAllItemRows([k], params)))
+    const byKind = {}
+    kindList.forEach((k, i) => {
+      byKind[k] = sortRows(perKind[i].filter(matches), params.sortBy, params.sortDirection)
+    })
+    ordered = orderInterleavedByKind(byKind)
+  } else {
+    const rows = await fetchAllItemRows(kindList, params)
+    ordered = sortRows(rows.filter(matches), params.sortBy, params.sortDirection)
+  }
   const start = page * size
-  return springPage(filtered.slice(start, start + size), page, size, filtered.length)
+  return springPage(ordered.slice(start, start + size), page, size, ordered.length)
 }
 
 async function fetchAllPages(fetchPage, signal) {

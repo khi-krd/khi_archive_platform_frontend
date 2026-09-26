@@ -17,7 +17,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 
-import { yearNum } from './khi-data'
+import { publishedYear, yearNum } from './khi-data'
 
 const FIRST_FALLBACK = 1900
 
@@ -75,10 +75,12 @@ function readFacetYearRange(facets) {
   return { min: Math.min(...candidates), max: Math.max(...candidates) }
 }
 
-// Pull a representative content year out of a (paginated or array) response.
+// Pull the PUBLISHMENT year out of a (paginated or array) response — the
+// catalogue's oldest/newest ordering is publishment-date based, so the
+// timeline must bound on that, never on the row's createdAt.
 function probeYear(res) {
   const item = res?.content?.[0] ?? (Array.isArray(res) ? res[0] : res?.[0])
-  return clampYear(yearNum(item || {}))
+  return clampYear(publishedYear(item || {}) ?? yearNum(item || {}))
 }
 
 // type: the active TYPE registry entry (has `.api` + `.showDateRange`).
@@ -109,7 +111,9 @@ export function useYearBounds(type, facets, apiOverride = null) {
     setProbed(null) // clear a previous type's span so it never flashes
     setSettled(false)
     setLoading(true)
-    const base = { page: 0, size: 1, sortBy: 'date' }
+    // datePublished = the publishment date, matching the catalogue's
+    // newest/oldest sort — NOT the record's database createdAt.
+    const base = { page: 0, size: 1, sortBy: 'datePublished' }
     Promise.all([
       api({ ...base, sortDirection: 'asc' }).catch(() => null),
       api({ ...base, sortDirection: 'desc' }).catch(() => null),

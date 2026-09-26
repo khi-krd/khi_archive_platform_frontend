@@ -109,6 +109,35 @@ function titleOfRow(item) {
 
 const KIND_ORDER = { image: 0, audio: 1, video: 2, text: 3 }
 
+// Round-robin classifier for the mixed "all" grid: every round contributes
+// `chunk` items per kind in kind order — 10 images, 10 audio, 10 video,
+// 10 text, then the next round repeats. Each kind's own list arrives
+// already sorted (server-side for guests, sortRows for staff), so the
+// interleave preserves the chosen ordering inside every 10-item run. A
+// kind that runs dry simply stops contributing while the rest continue.
+export function orderInterleavedByKind(
+  rowsByKind,
+  { chunk = 10, kindOrder = ['image', 'audio', 'video', 'text'] } = {},
+) {
+  const out = []
+  const cursor = {}
+  for (const kind of kindOrder) cursor[kind] = 0
+  for (;;) {
+    let added = 0
+    for (const kind of kindOrder) {
+      const list = rowsByKind[kind] || []
+      const start = cursor[kind]
+      const take = Math.min(chunk, list.length - start)
+      if (take <= 0) continue
+      for (let i = start; i < start + take; i++) out.push(list[i])
+      cursor[kind] = start + take
+      added += take
+    }
+    if (!added) break
+  }
+  return out
+}
+
 // Orders a mixed media list by the هاوتاگ contract. `kindOf` lets a caller
 // override how each row's media kind is read (defaults to row.kind).
 export function orderBySharedTag(rows, { kindOf = (row) => row?.kind } = {}) {

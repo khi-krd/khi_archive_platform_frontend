@@ -5,7 +5,7 @@ import { HighlightProvider } from '@/components/ui/highlight'
 import { readFacet, readMediaTypeCount, decodeSelectedFacets } from '@/components/public/public-helpers'
 import { guestAudios, guestFacets, guestImages, guestTexts, guestVideos } from '@/services/guest'
 import { getStaffBrowsePage, getStaffMediaPage } from '@/services/staff-public-catalog'
-import { orderBySharedTag } from '@/lib/tag-order'
+import { orderBySharedTag, orderInterleavedByKind } from '@/lib/tag-order'
 import { usePublicAccess } from '@/hooks/use-public-access'
 import KhiSidebar from '@/components/khi/KhiSidebar'
 import KhiToolbar from '@/components/khi/KhiToolbar'
@@ -24,6 +24,7 @@ import {
   cardFromItem,
   ENTITY_FILTER_KEYS,
   TYPE_PAGE_SIZES,
+  publishedYear,
 } from '@/components/khi/khi-data'
 
 // Entity scopes reachable via ?type= (the media kinds are reached by selecting
@@ -36,16 +37,17 @@ const MEDIA_APIS = {
   text: (params) => guestTexts.list(params),
 }
 
-function emptyMediaPage(page, size) {
+// Staff mixed-media pages go through the staff catalog service (it runs the
+// same classified/tag ordering client-side) and arrive back as a Spring page.
+async function loadStaffMediaSections(params, selectedKinds) {
+  const selected = new Set(selectedKinds.length ? selectedKinds : MEDIA_KINDS)
+  const kinds = MEDIA_KINDS.filter((kind) => selected.has(kind))
+  const page = await getStaffMediaPage(kinds, params)
   return {
-    content: [],
-    totalElements: 0,
-    totalPages: 0,
-    number: page,
-    size,
-    first: page === 0,
-    last: true,
-    empty: true,
+    items: page?.content || [],
+    totalElements: Number(page?.totalElements) || 0,
+    totalPages: Number(page?.totalPages) || 0,
+    number: Number(page?.number) || 0,
   }
 }
 
@@ -58,13 +60,16 @@ const TAG_SORT_MAX_PAGES = 10
 async function fetchAllMediaRows(kind, params) {
   const api = MEDIA_APIS[kind]
   if (!api) return []
-  // The tag ordering is computed locally — the per-kind API only has to
-  // return the filtered rows; a 'tag' sortBy would be unknown to it.
+  // Each kind's rows come back already sorted by the server for the normal
+  // sorts — only هاوتاگ ('tag') is a client-side ordering the endpoint
+  // wouldn't understand, so that's the one key stripped before calling.
   const rest = { ...params }
-  delete rest.sortBy
-  delete rest.sortDirection
   delete rest.page
   delete rest.size
+  if (rest.sortBy === 'tag') {
+    delete rest.sortBy
+    delete rest.sortDirection
+  }
   const rows = []
   let page = 0
   let totalPages = 1
@@ -82,42 +87,46 @@ async function fetchAllMediaRows(kind, params) {
   return rows.map((row) => ({ ...row, kind }))
 }
 
-// هاوتاگ ordering spans all four media kinds (tag group → image→audio→
-// video→text → title), which no single per-type endpoint can produce — so
-// the guest path gathers every filtered row, orders it once, then slices
-// the requested page locally. The ordered list is cached per query so a
-// "show more" click re-slices without refetching every kind again.
-const tagOrderCache = new Map()
-const TAG_ORDER_CACHE_MAX = 4
+// The mixed "all" grid is classified in repeating 40-item rounds — 10
+// images, 10 audio, 10 video, 10 text — and هاوتاگ groups by shared tag.
+// Neither order can survive per-type server paging, so the guest path
+// gathers each kind's filtered rows once (server-sorted per kind), builds
+// the merged order locally, and slices the requested page. The ordered
+// list is cached per query+sort so "show more" re-slices without refetching.
+const orderedMediaCache = new Map()
+const ORDERED_CACHE_MAX = 4
 
-function tagOrderCacheKey(kinds, params) {
+function orderedCacheKey(kinds, params) {
   const rest = { ...params }
   delete rest.signal
   delete rest.page
   delete rest.size
-  delete rest.sortBy
-  delete rest.sortDirection
   return `${kinds.join(',')}|${JSON.stringify(rest)}`
 }
 
-async function loadTagOrderedMediaPage(params, selectedKinds) {
-  const kinds = selectedKinds.length ? selectedKinds.filter((k) => MEDIA_APIS[k]) : MEDIA_KINDS
+async function loadOrderedMediaPage(params, selectedKinds) {
+  const kinds = MEDIA_KINDS.filter((k) => !selectedKinds.length || selectedKinds.includes(k))
   const size = params.size || 50
   const page = params.page || 0
-  const cacheKey = tagOrderCacheKey(kinds, params)
-  let ordered = tagOrderCache.get(cacheKey)
+  const cacheKey = orderedCacheKey(kinds, params)
+  let ordered = orderedMediaCache.get(cacheKey)
   if (!ordered) {
-    const collected = []
+    const byKind = {}
+    const flat = []
     for (const kind of kinds) {
-      collected.push(...await fetchAllMediaRows(kind, params))
+      const rows = await fetchAllMediaRows(kind, params)
+      byKind[kind] = rows
+      flat.push(...rows)
     }
-    ordered = orderBySharedTag(collected)
+    ordered = params.sortBy === 'tag'
+      ? orderBySharedTag(flat)
+      : orderInterleavedByKind(byKind)
     // A partial list from an aborted fetch must not poison the cache.
     if (!params.signal?.aborted) {
-      if (tagOrderCache.size >= TAG_ORDER_CACHE_MAX) {
-        tagOrderCache.delete(tagOrderCache.keys().next().value)
+      if (orderedMediaCache.size >= ORDERED_CACHE_MAX) {
+        orderedMediaCache.delete(orderedMediaCache.keys().next().value)
       }
-      tagOrderCache.set(cacheKey, ordered)
+      orderedMediaCache.set(cacheKey, ordered)
     }
   }
   return {
@@ -128,39 +137,27 @@ async function loadTagOrderedMediaPage(params, selectedKinds) {
   }
 }
 
-async function loadPublicMediaSections(params, selectedKinds, staff = false) {
-  const selected = new Set(selectedKinds.length ? selectedKinds : MEDIA_KINDS)
-  if (staff) {
-    const kinds = MEDIA_KINDS.filter((kind) => selected.has(kind))
-    const page = await getStaffMediaPage(kinds, params)
-    return {
-      items: page?.content || [],
-      totalElements: Number(page?.totalElements) || 0,
-      totalPages: Number(page?.totalPages) || 0,
-      number: Number(page?.number) || 0,
-    }
-  }
-  const entries = await Promise.all(
-    MEDIA_KINDS.map(async (kind) => {
-      if (!selected.has(kind)) return [kind, emptyMediaPage(params.page, params.size)]
-      const page = await MEDIA_APIS[kind](params)
-      return [kind, page || emptyMediaPage(params.page, params.size)]
-    }),
+// The 'all' scope has no single list endpoint, so the year-slider probe fans
+// out to every kind and keeps the global extreme — that way the timeline's
+// bounds are the oldest/newest PUBLISHED work in the whole archive, not just
+// one kind's. `params` carries sortBy=datePublished + asc|desc, size=1.
+async function probeAllMediaBounds(params, staff) {
+  const results = await Promise.all(
+    MEDIA_KINDS.map((kind) =>
+      (staff ? getStaffBrowsePage(kind, params) : MEDIA_APIS[kind](params)).catch(() => null),
+    ),
   )
-
-  const items = entries.flatMap(([kind, page]) =>
-    (page?.content || []).map((item) => ({ ...item, kind })),
-  )
-  const totalElements = entries.reduce(
-    (sum, [, page]) => sum + (Number(page?.totalElements) || 0),
-    0,
-  )
-  const totalPages = entries.reduce(
-    (max, [, page]) => Math.max(max, Number(page?.totalPages) || 0),
-    0,
-  )
-
-  return { items, totalElements, totalPages, number: params.page }
+  const items = results.map((res) => res?.content?.[0]).filter(Boolean)
+  if (!items.length) return { content: [] }
+  const asc = params.sortDirection === 'asc'
+  items.sort((a, b) => {
+    const ay = publishedYear(a)
+    const by = publishedYear(b)
+    const av = ay ?? (asc ? Number.MAX_SAFE_INTEGER : Number.MIN_SAFE_INTEGER)
+    const bv = by ?? (asc ? Number.MAX_SAFE_INTEGER : Number.MIN_SAFE_INTEGER)
+    return asc ? av - bv : bv - av
+  })
+  return { content: [items[0]] }
 }
 
 // Skeleton placeholder cards shown while a page of results loads — the same
@@ -261,8 +258,14 @@ export function KhiBrowsePage() {
     () => ({ ...(facets || {}), ...(publicFilterCounts.facets || {}), ...dataFacets }),
     [facets, publicFilterCounts.facets, dataFacets],
   )
-  // Oldest → newest YEAR span for the date filter bounds, derived from live data.
-  const yearBounds = useYearBounds(type, facets, staffTypeApi)
+  // Oldest → newest PUBLISHMENT year span for the date filter bounds,
+  // derived from live data. 'all' has no list endpoint, so it probes every
+  // kind and keeps the global extreme (see probeAllMediaBounds).
+  const allBoundsProbe = useMemo(
+    () => (params) => probeAllMediaBounds(params, isStaff),
+    [isStaff],
+  )
+  const yearBounds = useYearBounds(type, facets, typeKey === 'all' ? allBoundsProbe : staffTypeApi)
   // Accumulating result list: a fresh query replaces it; "Show more" appends the
   // next API page. `meta` mirrors the Spring Page envelope (number/totalPages/
   // totalElements). `page` is the highest page index loaded so far.
@@ -344,22 +347,33 @@ export function KhiBrowsePage() {
 
     const params = { page: targetPage, size: pageSize, sortBy, sortDirection: sortDir, signal: ctrl.signal }
     if (q) params.q = q
-    if (type.showDateRange && dateFrom) params.dateFrom = dateFrom
-    if (type.showDateRange && dateTo) params.dateTo = dateTo
+    // The timeline filter is PUBLISHMENT-date semantics: guests hit the
+    // publishedFrom/publishedTo params the guest media endpoints expose;
+    // staff rows are matched client-side on datePublished (see
+    // matchesMediaFilters in the staff catalog service).
+    if (type.showDateRange && dateFrom) {
+      if (isStaff) params.dateFrom = dateFrom
+      else params.publishedFrom = dateFrom
+    }
+    if (type.showDateRange && dateTo) {
+      if (isStaff) params.dateTo = dateTo
+      else params.publishedTo = dateTo
+    }
     for (const group of filterGroups) {
       const list = selected[group.paramKey]
       if (!Array.isArray(list) || !list.length) continue
       params[group.paramKey] = list
     }
-    // هاوتاگ needs a cross-kind order no single endpoint can produce, so
-    // guests gather every filtered row and order locally. Staff rows get
-    // the same treatment inside the staff catalog service.
-    const guestTagOrder =
-      !isStaff && sortBy === 'tag' && (typeKey === 'all' || Boolean(MEDIA_APIS[typeKey]))
-    const request = guestTagOrder
-      ? loadTagOrderedMediaPage(params, typeKey === 'all' ? selectedMediaTypes : [typeKey])
+    // The mixed grid is classified in 10-per-kind rounds and هاوتاگ orders
+    // by shared tag — neither can survive per-type server paging, so guests
+    // gather each kind's filtered rows once and assemble pages locally.
+    // Staff rows take the same route inside the staff catalog service.
+    const guestLocalOrder =
+      !isStaff && (typeKey === 'all' || (sortBy === 'tag' && Boolean(MEDIA_APIS[typeKey])))
+    const request = guestLocalOrder
+      ? loadOrderedMediaPage(params, typeKey === 'all' ? selectedMediaTypes : [typeKey])
       : typeKey === 'all'
-        ? loadPublicMediaSections(params, selectedMediaTypes, isStaff)
+        ? loadStaffMediaSections(params, selectedMediaTypes)
         : (isStaff ? getStaffBrowsePage(typeKey, params) : type.api(params))
 
     request
