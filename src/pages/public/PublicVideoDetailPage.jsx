@@ -35,7 +35,7 @@ function PublicVideoDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [helpOpen, setHelpOpen] = useState(false)
-  const { isStaff, ready: accessReady } = usePublicAccess()
+  const { isStaff, isAdmin, ready: accessReady } = usePublicAccess()
 
   useEffect(() => {
     if (routeCode && !isEncodedPublicCode(routeCode)) {
@@ -99,7 +99,7 @@ function PublicVideoDetailPage() {
         <KhiMetaRow label={DETAIL.person} value={person?.personCode}><KhiPersonLink person={person} fallbackName={person?.name} /></KhiMetaRow>
         <KhiMetaRow label={DETAIL.categories} value={video.categories}><KhiCategoryLinks categories={video.categories} /></KhiMetaRow>
       </KhiMetaPanel>
-      <KhiPublicMediaFields kind="video" item={video} full={isStaff} />
+      <KhiPublicMediaFields kind="video" item={video} full={isAdmin} />
     </>
   )
 

@@ -40,7 +40,7 @@ function PublicImageDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [helpOpen, setHelpOpen] = useState(false)
-  const { isStaff, ready: accessReady } = usePublicAccess()
+  const { isStaff, isAdmin, ready: accessReady } = usePublicAccess()
 
   useEffect(() => {
     if (routeCode && !isEncodedPublicCode(routeCode)) {
@@ -112,7 +112,7 @@ function PublicImageDetailPage() {
         <KhiMetaRow label={DETAIL.person} value={person?.personCode}><KhiPersonLink person={person} fallbackName={person?.name} /></KhiMetaRow>
         <KhiMetaRow label={DETAIL.categories} value={image.categories}><KhiCategoryLinks categories={image.categories} /></KhiMetaRow>
       </KhiMetaPanel>
-      <KhiPublicMediaFields kind="image" item={image} full={isStaff} />
+      <KhiPublicMediaFields kind="image" item={image} full={isAdmin} />
     </>
   )
 

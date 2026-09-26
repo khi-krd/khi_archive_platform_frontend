@@ -802,8 +802,10 @@
 .khi-root .detail-actions{display:flex;flex-wrap:wrap;gap:10px}
 .khi-root .detail-btn{display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 20px;border-radius:13px;border:1px solid var(--line-2);background:#fff;color:var(--ink);font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer;text-decoration:none;transition:.18s;white-space:nowrap}
 .khi-root .detail-btn:hover{border-color:var(--pine-2);background:var(--paper-3)}
-.khi-root .detail-btn.primary{border:0;background:var(--pine);color:#fff;box-shadow:0 14px 28px -14px rgba(25,86,58,.55)}
+.khi-root .detail-btn.primary{border:0;background:var(--pine);color:#fff;box-shadow:0 12px 26px -12px rgba(25,86,58,.6)}
 .khi-root .detail-btn.primary:hover{background:var(--pine-2)}
+.khi-root .detail-btn.primary:active{transform:translateY(0);box-shadow:0 8px 18px -12px rgba(25,86,58,.6)}
+.khi-root .detail-btn.primary:focus-visible{outline:2px solid var(--pine-2);outline-offset:3px}
 .khi-root .detail-btn svg{flex-shrink:0}
 
 /* ── Media detail — media-first layout ────────────────────────────────────── */
@@ -813,7 +815,7 @@
 .khi-root .detail-topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:20px}
 .khi-root .detail-topbar .detail-crumb{margin:0}
 .khi-root .detail-topbar .detail-actions{flex-shrink:0}
-.khi-root .detail-topbar .detail-btn{height:40px;padding:0 18px;border-radius:11px}
+.khi-root .detail-topbar .detail-btn{height:42px;padding:0 20px;border-radius:12px}
 .khi-root .detail-media-lead{margin-bottom:34px}
 .khi-root .detail-media-lead .media-stage,
 .khi-root .detail-media-lead .player-mount{margin-bottom:0}
@@ -822,7 +824,14 @@
 .khi-root .detail-head h1{margin:0;font-family:'Amiri',serif;font-weight:700;font-size:clamp(32px,3.4vw,52px);line-height:1.3;color:var(--ink);word-break:break-word}
 .khi-root .detail-head h2{margin:10px 0 16px;color:var(--pine);font-size:20px;font-weight:700;line-height:1.6}
 .khi-root .detail-desc{margin:0;color:var(--ink-soft);font-size:16.5px;line-height:2.05;max-width:780px;white-space:pre-line;word-break:break-word}
-.khi-root .detail-head-tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+.khi-root .detail-head-tags{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 20px;margin-top:22px}
+/* tags as plain type, not chips — a hairline dot separates them and the
+   hover is a quiet underline instead of a bordered pill */
+.khi-root .detail-head-tags .hero-tag{position:relative;padding:0;border:0;border-radius:0;background:none;color:var(--pine);font-size:14px;font-weight:700}
+.khi-root .detail-head-tags .hero-tag:hover{background:none;color:var(--pine-deep)}
+.khi-root .detail-head-tags .hero-tag::after{content:"";position:absolute;inset-inline:0;bottom:-2px;height:1.5px;border-radius:1px;background:currentColor;opacity:0;transition:opacity .15s}
+.khi-root .detail-head-tags .hero-tag:hover::after{opacity:.5}
+.khi-root .detail-head-tags .hero-tag + .hero-tag::before{content:"";position:absolute;inset-inline-start:-13px;top:50%;width:4px;height:4px;border-radius:50%;background:var(--line-2);transform:translateY(-50%)}
 .khi-root .detail-head-actions{margin-top:24px}
 @media(max-width:640px){
   .khi-root .detail-topbar{flex-direction:column;align-items:stretch}
@@ -1643,7 +1652,7 @@
 .khi-root .media-stage{border-radius:22px;box-shadow:0 30px 70px -38px rgba(12,44,29,.75)}
 .khi-root .detail-btn{transition:transform .2s,box-shadow .2s,border-color .2s,background .2s}
 .khi-root .detail-btn:hover{transform:translateY(-1px)}
-.khi-root .detail-btn.primary{box-shadow:0 16px 30px -14px rgba(25,86,58,.55)}
+.khi-root .detail-btn.primary{box-shadow:0 14px 30px -14px rgba(25,86,58,.62),inset 0 1px 0 rgba(255,255,255,.15)}
 .khi-root .meta-panel::before{background:var(--pine-2)}
 .khi-root .mic-badge{border:1px solid rgba(33,112,73,.35)}
 

@@ -328,7 +328,7 @@ function PublicTextDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [helpOpen, setHelpOpen] = useState(false)
-  const { isStaff, ready: accessReady } = usePublicAccess()
+  const { isStaff, isAdmin, ready: accessReady } = usePublicAccess()
 
   useEffect(() => {
     if (routeCode && !isEncodedPublicCode(routeCode)) {
@@ -403,7 +403,7 @@ function PublicTextDetailPage() {
         <KhiMetaRow label={DETAIL.person} value={person?.personCode}><KhiPersonLink person={person} fallbackName={person?.name} /></KhiMetaRow>
         <KhiMetaRow label={DETAIL.categories} value={text.categories}><KhiCategoryLinks categories={text.categories} /></KhiMetaRow>
       </KhiMetaPanel>
-      <KhiPublicMediaFields kind="text" item={text} full={isStaff} />
+      <KhiPublicMediaFields kind="text" item={text} full={isAdmin} />
     </>
   )
 

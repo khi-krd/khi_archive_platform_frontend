@@ -11,11 +11,16 @@ export function usePublicAccess() {
   const hasSession = Boolean(getStoredToken())
   const accountArea = getAccountArea(profile?.role)
   const isStaff = accountArea === 'admin' || accountArea === 'employee'
+  // The complete internal ledger is ADMIN-only on public pages — employees
+  // still fetch through the staff API (they can preview private records),
+  // but the rendered field set drops to the guest whitelist.
+  const isAdmin = accountArea === 'admin'
 
   return {
     profile,
     accountArea,
     isStaff,
+    isAdmin,
     ready: !hasSession || Boolean(profile),
   }
 }
