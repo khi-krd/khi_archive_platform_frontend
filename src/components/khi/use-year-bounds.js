@@ -75,12 +75,27 @@ function readFacetYearRange(facets) {
   return { min: Math.min(...candidates), max: Math.max(...candidates) }
 }
 
+// The year strictly from `datePublished` — nothing else counts for slider
+// bounds (the user asked: the publication date, never the DB createdAt).
+export function strictPublishedYear(item) {
+  const m = String(item?.datePublished ?? '').match(/(\d{4})/)
+  const n = m ? Number(m[1]) : NaN
+  return Number.isFinite(n) ? n : null
+}
+
 // Pull the PUBLISHMENT year out of a (paginated or array) response — the
 // catalogue's oldest/newest ordering is publishment-date based, so the
-// timeline must bound on that, never on the row's createdAt.
+// timeline must bound on that, never on the row's createdAt. Scan the first
+// few rows: a sorted list can surface an undated row first (fallback sorts
+// key it on its content date), and we want the first truly dated one.
 function probeYear(res) {
-  const item = res?.content?.[0] ?? (Array.isArray(res) ? res[0] : res?.[0])
-  return clampYear(publishedYear(item || {}) ?? yearNum(item || {}))
+  const rows = Array.isArray(res?.content) ? res.content : Array.isArray(res) ? res : []
+  for (const row of rows) {
+    const n = strictPublishedYear(row)
+    if (n != null) return clampYear(n)
+  }
+  const first = rows[0] ?? res?.content?.[0] ?? {}
+  return clampYear(publishedYear(first) ?? yearNum(first))
 }
 
 // type: the active TYPE registry entry (has `.api` + `.showDateRange`).
@@ -112,8 +127,9 @@ export function useYearBounds(type, facets, apiOverride = null) {
     setSettled(false)
     setLoading(true)
     // datePublished = the publishment date, matching the catalogue's
-    // newest/oldest sort — NOT the record's database createdAt.
-    const base = { page: 0, size: 1, sortBy: 'datePublished' }
+    // newest/oldest sort — NOT the record's database createdAt. size=4 so a
+    // list whose head rows lack datePublished still exposes a dated one.
+    const base = { page: 0, size: 4, sortBy: 'datePublished' }
     Promise.all([
       api({ ...base, sortDirection: 'asc' }).catch(() => null),
       api({ ...base, sortDirection: 'desc' }).catch(() => null),

@@ -10,7 +10,7 @@ import { usePublicAccess } from '@/hooks/use-public-access'
 import KhiSidebar from '@/components/khi/KhiSidebar'
 import KhiToolbar from '@/components/khi/KhiToolbar'
 import KhiCard from '@/components/khi/KhiCard'
-import { useYearBounds } from '@/components/khi/use-year-bounds'
+import { strictPublishedYear, useYearBounds } from '@/components/khi/use-year-bounds'
 import { useDataFacets } from '@/components/khi/use-data-facets'
 import { usePublicFilterCounts } from '@/components/khi/use-public-filter-counts'
 import { IconClose } from '@/components/khi/icons'
@@ -24,7 +24,6 @@ import {
   cardFromItem,
   ENTITY_FILTER_KEYS,
   TYPE_PAGE_SIZES,
-  publishedYear,
 } from '@/components/khi/khi-data'
 
 // Entity scopes reachable via ?type= (the media kinds are reached by selecting
@@ -144,19 +143,21 @@ async function loadOrderedMediaPage(params, selectedKinds) {
 async function probeAllMediaBounds(params, staff) {
   const results = await Promise.all(
     MEDIA_KINDS.map((kind) =>
-      (staff ? getStaffBrowsePage(kind, params) : MEDIA_APIS[kind](params)).catch(() => null),
+      (staff ? getStaffBrowsePage(kind, { ...params, size: 4 }) : MEDIA_APIS[kind]({ ...params, size: 4 })).catch(
+        () => null,
+      ),
     ),
   )
-  const items = results.map((res) => res?.content?.[0]).filter(Boolean)
+  // First DATED row per kind — strict datePublished only, so an undated head
+  // row can't hide the true oldest/newest published item behind it.
+  const items = results
+    .map((res) => (res?.content ?? []).find((row) => strictPublishedYear(row) != null))
+    .filter(Boolean)
   if (!items.length) return { content: [] }
   const asc = params.sortDirection === 'asc'
-  items.sort((a, b) => {
-    const ay = publishedYear(a)
-    const by = publishedYear(b)
-    const av = ay ?? (asc ? Number.MAX_SAFE_INTEGER : Number.MIN_SAFE_INTEGER)
-    const bv = by ?? (asc ? Number.MAX_SAFE_INTEGER : Number.MIN_SAFE_INTEGER)
-    return asc ? av - bv : bv - av
-  })
+  items.sort((a, b) =>
+    asc ? strictPublishedYear(a) - strictPublishedYear(b) : strictPublishedYear(b) - strictPublishedYear(a),
+  )
   return { content: [items[0]] }
 }
 
@@ -265,7 +266,14 @@ export function KhiBrowsePage() {
     () => (params) => probeAllMediaBounds(params, isStaff),
     [isStaff],
   )
-  const yearBounds = useYearBounds(type, facets, typeKey === 'all' ? allBoundsProbe : staffTypeApi)
+  // Facet year bounds are archive-wide (datePublished min/max across every
+  // kind) — only hand them to the 'all' slider; single-type sliders stay
+  // bounded by their own probe so the track isn't wider than that type's data.
+  const yearBounds = useYearBounds(
+    type,
+    typeKey === 'all' ? facets : null,
+    typeKey === 'all' ? allBoundsProbe : staffTypeApi,
+  )
   // Accumulating result list: a fresh query replaces it; "Show more" appends the
   // next API page. `meta` mirrors the Spring Page envelope (number/totalPages/
   // totalElements). `page` is the highest page index loaded so far.
