@@ -9,10 +9,8 @@ import {
   Loader2,
   LogIn,
   MapPin,
-  MessageSquarePlus,
   Music,
   Scale,
-  Search,
   Send,
   Tag,
   Users,
@@ -22,6 +20,7 @@ import { Link } from 'react-router-dom'
 
 import '@/styles/khi-theme.css'
 import { useCurrentProfile } from '@/hooks/use-current-profile'
+import { KhiLogo } from '@/components/brand/KhiLogo'
 import { pickMediaTitle } from '@/components/public/public-helpers'
 import { getMyCorrections, submitCorrection } from '@/services/corrections'
 
@@ -36,9 +35,6 @@ const KU = {
   thanks: 'سوپاس بۆ یارمەتیت!',
   thanksBody: (n) => `${n} ڕاستکردنەوە بە سەرکەوتوویی نێردرا. تیمەکەمان پێداچوونەوەی بۆ دەکات و جێبەجێی دەکات.`,
   done: 'تەواو',
-  searchFields: 'گەڕان بەناو خانەکان…',
-  searchLabel: 'گەڕان بەناو خانەکان',
-  clearSearch: 'پاککردنەوەی گەڕان',
   currentValue: 'نرخی ئێستا لە گەنجینەکەدا',
   noValue: 'هیچ نرخێک بۆ ئەم خانەیە دانەنراوە',
   yourCorrection: 'ڕاستکردنەوەکەت',
@@ -323,7 +319,6 @@ function HelpUsDialog({ open, onOpenChange, mediaType, mediaCode, mediaTitle, me
 
   const [selectedKey, setSelectedKey] = useState(allFields[0]?.key ?? '')
   const [corrections, setCorrections] = useState({})
-  const [fieldQuery, setFieldQuery] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
   const [submitted, setSubmitted] = useState(false)
@@ -340,7 +335,6 @@ function HelpUsDialog({ open, onOpenChange, mediaType, mediaCode, mediaTitle, me
   const uid = useId()
   const titleId = `${uid}-title`
   const descId = `${uid}-desc`
-  const searchId = `${uid}-search`
   const editorId = `${uid}-editor`
   const listId = `${uid}-list`
   const optionId = (key) => `${uid}-opt-${key}`
@@ -366,13 +360,7 @@ function HelpUsDialog({ open, onOpenChange, mediaType, mediaCode, mediaTitle, me
     return map
   }, [groups])
 
-  const visibleGroups = useMemo(() => {
-    const nq = fieldQuery.trim().toLowerCase()
-    if (!nq) return groups
-    return groups
-      .map((g) => ({ ...g, fields: g.fields.filter((f) => f.label.toLowerCase().includes(nq)) }))
-      .filter((g) => g.fields.length)
-  }, [groups, fieldQuery])
+  const visibleGroups = groups
 
   const visibleKeys = useMemo(
     () => visibleGroups.flatMap((g) => g.fields.map((f) => f.key)),
@@ -384,7 +372,6 @@ function HelpUsDialog({ open, onOpenChange, mediaType, mediaCode, mediaTitle, me
     if (open) {
       setSelectedKey(allFields[0]?.key ?? '')
       setCorrections({})
-      setFieldQuery('')
       setSubmitting(false)
       setSubmitError('')
       setSubmitted(false)
@@ -551,16 +538,11 @@ function HelpUsDialog({ open, onOpenChange, mediaType, mediaCode, mediaTitle, me
       >
         {/* ═══ HEADER ═══ */}
         <header className="khi-help-head flex shrink-0 items-start justify-between gap-4 border-b border-border px-4 py-4 sm:px-6">
-          <div className="flex min-w-0 items-center gap-3">
-            <span aria-hidden="true" className="khi-help-mark grid size-11 shrink-0 place-items-center rounded-xl text-primary-foreground">
-              <MessageSquarePlus className="size-5" />
-            </span>
+          <div className="flex min-w-0 items-center gap-3.5">
+            <KhiLogo className="size-12" />
             <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                <h2 id={titleId} className="font-heading text-[19px] font-bold leading-tight text-foreground">{KU.title}</h2>
-                <span className="rounded-md border border-border bg-secondary px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-secondary-foreground">{mediaType}</span>
-              </div>
-              <p id={descId} className="mt-1 line-clamp-1 text-[13px] text-muted-foreground">
+              <h2 id={titleId} className="font-heading text-[26px] font-bold leading-tight text-foreground">{KU.title}</h2>
+              <p id={descId} className="mt-1 line-clamp-1 text-[13.5px] text-muted-foreground">
                 {mediaTitle || KU.subtitle}
               </p>
             </div>
@@ -610,21 +592,6 @@ function HelpUsDialog({ open, onOpenChange, mediaType, mediaCode, mediaTitle, me
                 pickerOpen ? 'flex flex-1' : 'hidden',
               ].join(' ')}
             >
-              <div className="shrink-0 border-b border-border p-3">
-                <label htmlFor={searchId} className="sr-only">{KU.searchLabel}</label>
-                <div className="relative">
-                  <Search aria-hidden="true" className="pointer-events-none absolute inset-y-0 end-3 my-auto size-4 text-muted-foreground" />
-                  <input
-                    id={searchId}
-                    type="search"
-                    value={fieldQuery}
-                    onChange={(e) => setFieldQuery(e.target.value)}
-                    placeholder={KU.searchFields}
-                    className="h-11 w-full rounded-lg border border-border bg-background pe-10 ps-3 text-[14px] text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-[var(--ring)]/25"
-                  />
-                </div>
-              </div>
-
               <div
                 ref={listRef}
                 id={listId}
