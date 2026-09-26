@@ -583,7 +583,9 @@ export function cardFromItem(item, typeKey) {
         : kind === 'text'
           ? resolveMediaUrl(item.coverImageUrl) || null
           : null,
-    videoSrc: kind === 'video' ? resolveMediaUrl(item.videoFileUrl || item.fileUrl) || null : null,
+    videoSrc: kind === 'video'
+      ? resolveMediaUrl(item.videoFileUrl || item.mediaUrl || item.fileUrl) || null
+      : null,
     tags: tagsOf(item),
     matchedOn: Array.isArray(item.matchedOn) ? item.matchedOn : null,
     ...trend,
