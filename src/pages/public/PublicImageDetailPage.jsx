@@ -83,28 +83,27 @@ function PublicImageDetailPage() {
   const fileUrl = isStaff ? staffImage.url : resolveMediaUrl(image.imageFileUrl)
   const projectCode = image.project?.projectCode || image.projectCode
 
-  const content = (
-    <>
-      {fileUrl ? (
-        <div
-          className="media-stage image protected-media"
-          onAuxClick={stopProtectedMediaEvent}
-          onContextMenu={stopProtectedMediaEvent}
-        >
-          <DeepZoomViewer
-            src={fileUrl}
-            alt={title}
-            className="h-[70vh] max-h-[78vh] w-full rounded-none border-0 bg-transparent shadow-none"
-          />
-        </div>
-      ) : isStaff && staffImage.loading ? (
-        <div className="media-unavailable">…</div>
-      ) : (
-        <div className="media-unavailable">{DETAIL.fileUnavailable}</div>
-      )}
-      {image.photostory ? <KhiContentCard icon={IconImage} title={DETAIL.photostory}><p>{image.photostory}</p></KhiContentCard> : null}
-    </>
+  const media = fileUrl ? (
+    <div
+      className="media-stage image protected-media"
+      onAuxClick={stopProtectedMediaEvent}
+      onContextMenu={stopProtectedMediaEvent}
+    >
+      <DeepZoomViewer
+        src={fileUrl}
+        alt={title}
+        className="h-[70vh] max-h-[78vh] w-full rounded-none border-0 bg-transparent shadow-none"
+      />
+    </div>
+  ) : isStaff && staffImage.loading ? (
+    <div className="media-unavailable">…</div>
+  ) : (
+    <div className="media-unavailable">{DETAIL.fileUnavailable}</div>
   )
+
+  const content = image.photostory
+    ? <KhiContentCard icon={IconImage} title={DETAIL.photostory}><p>{image.photostory}</p></KhiContentCard>
+    : null
 
   const meta = (
     <>
@@ -122,11 +121,9 @@ function PublicImageDetailPage() {
       <HelpUsDialog open={helpOpen} onOpenChange={setHelpOpen} mediaType="IMAGE" mediaCode={code} mediaTitle={title} mediaData={image} />
       <KhiDetailShell>
         <KhiMediaDetail
-          kind="image"
           title={title}
           subtitle={original}
           description={image.description}
-          image={fileUrl}
           tags={toList(image.tags)}
           breadcrumbItems={[
             { to: '/public', label: DETAIL.home },
@@ -138,6 +135,7 @@ function PublicImageDetailPage() {
           ] : []}
           helpAction={{ label: DETAIL.help, onClick: () => setHelpOpen(true) }}
           footerYear={yearNum(image)}
+          media={media}
           content={content}
           meta={meta}
         />

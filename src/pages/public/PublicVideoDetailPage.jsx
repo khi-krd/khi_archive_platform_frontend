@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { VideoPlayer } from '@/components/ui/video-player'
 import { HelpUsDialog } from '@/components/public/HelpUsDialog'
 import {
-  mediaThumbHref, pickMediaTitle, extractPersonFromItem,
+  pickMediaTitle, extractPersonFromItem,
 } from '@/components/public/public-helpers'
 import { DETAIL, yearNum } from '@/components/khi/khi-data'
 import KhiMediaDetail from '@/components/khi/KhiMediaDetail'
@@ -88,20 +88,19 @@ function PublicVideoDetailPage() {
   const original = originalCandidate && originalCandidate !== title ? originalCandidate : null
   const projectCode = video.project?.projectCode || video.projectCode
 
-  const content = (
-    <>
-      {playbackSrc ? (
-        <div className="player-mount protected-media" style={{ marginBottom: 22 }}>
-          <VideoPlayer src={playbackSrc} title={title} subtitle={video.event || video.location || video.language || ''} protectedMode />
-        </div>
-      ) : isStaff && staffVideo.loading ? (
-        <div className="media-unavailable">…</div>
-      ) : (
-        <div className="media-unavailable">{DETAIL.fileUnavailable}</div>
-      )}
-      {video.transcription ? <KhiContentCard icon={IconText} title={DETAIL.transcription}><p>{video.transcription}</p></KhiContentCard> : null}
-    </>
+  const media = playbackSrc ? (
+    <div className="player-mount protected-media">
+      <VideoPlayer src={playbackSrc} title={title} subtitle={video.event || video.location || video.language || ''} protectedMode />
+    </div>
+  ) : isStaff && staffVideo.loading ? (
+    <div className="media-unavailable">…</div>
+  ) : (
+    <div className="media-unavailable">{DETAIL.fileUnavailable}</div>
   )
+
+  const content = video.transcription
+    ? <KhiContentCard icon={IconText} title={DETAIL.transcription}><p>{video.transcription}</p></KhiContentCard>
+    : null
 
   const meta = (
     <>
@@ -119,11 +118,9 @@ function PublicVideoDetailPage() {
       <HelpUsDialog open={helpOpen} onOpenChange={setHelpOpen} mediaType="VIDEO" mediaCode={code} mediaTitle={title} mediaData={video} />
       <KhiDetailShell>
         <KhiMediaDetail
-          kind="video"
           title={title}
           subtitle={original}
           description={video.description}
-          image={mediaThumbHref(video)}
           tags={toList(video.tags)}
           breadcrumbItems={[
             { to: '/public', label: DETAIL.home },
@@ -135,6 +132,7 @@ function PublicVideoDetailPage() {
           ] : []}
           helpAction={{ label: DETAIL.help, onClick: () => setHelpOpen(true) }}
           footerYear={yearNum(video)}
+          media={media}
           content={content}
           meta={meta}
         />

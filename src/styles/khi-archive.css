@@ -806,6 +806,29 @@
 .khi-root .detail-btn.primary:hover{background:linear-gradient(145deg,var(--pine),var(--pine-deep))}
 .khi-root .detail-btn svg{flex-shrink:0}
 
+/* ── Media detail — media-first layout ────────────────────────────────────── */
+/* The file leads the page; a slim utility row above it carries the breadcrumb
+   and the (green, white-text) help button, and the identity band sits below
+   the media as a clean text block — no gradient card. */
+.khi-root .detail-topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.khi-root .detail-topbar .detail-crumb{margin:0}
+.khi-root .detail-topbar .detail-actions{flex-shrink:0}
+.khi-root .detail-topbar .detail-btn{height:40px;padding:0 18px;border-radius:11px}
+.khi-root .detail-media-lead{margin-bottom:34px}
+.khi-root .detail-media-lead .media-stage,
+.khi-root .detail-media-lead .player-mount{margin-bottom:0}
+.khi-root .detail-head{position:relative;margin-bottom:38px;padding:4px 4px 30px;border-bottom:1px solid var(--line)}
+.khi-root .detail-head::after{content:"";position:absolute;bottom:-1.5px;inset-inline-start:0;width:78px;height:3px;border-radius:3px;background:var(--pine)}
+.khi-root .detail-head h1{margin:0;font-family:'Amiri',serif;font-weight:700;font-size:clamp(32px,3.4vw,52px);line-height:1.3;color:var(--ink);word-break:break-word}
+.khi-root .detail-head h2{margin:10px 0 16px;color:var(--pine);font-size:20px;font-weight:700;line-height:1.6}
+.khi-root .detail-desc{margin:0;color:var(--ink-soft);font-size:16.5px;line-height:2.05;max-width:780px;white-space:pre-line;word-break:break-word}
+.khi-root .detail-head-tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+.khi-root .detail-head-actions{margin-top:24px}
+@media(max-width:640px){
+  .khi-root .detail-topbar{flex-direction:column;align-items:stretch}
+  .khi-root .detail-topbar .detail-actions{align-self:flex-end}
+}
+
 /* ── Kind-specific public detail pages ────────────────────────────────────── */
 .khi-root .detail-hero.kind-audio{
   background:

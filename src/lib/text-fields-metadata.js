@@ -145,19 +145,19 @@ const textFieldsMetadata = {
 
   // ── Dates ─────────────────────────────────────────────────────────
   dateCreated: {
-    title: 'بەرواری دروستکردن',
+    title: 'ڕێکەوتی دروستکردن',
     description: 'ڕۆژی نووسینی سەرەتایی دەقەکە.',
   },
   printDate: {
-    title: 'بەرواری چاپ',
+    title: 'ڕێکەوتی چاپ',
     description: 'ڕۆژی چاپکردنی فیزیکی.',
   },
   datePublished: {
-    title: 'بەرواری بڵاوکردنەوە',
+    title: 'ڕێکەوتی بڵاوکردنەوە',
     description: 'ڕۆژی بڵاوکردنەوەی فەرمی.',
   },
   dateModified: {
-    title: 'بەرواری گۆڕانکاری',
+    title: 'ڕێکەوتی گۆڕانکاری',
     description: 'دوایین جار کە دەق یان زانیارییەکانی گۆڕاون.',
   },
 
@@ -229,7 +229,7 @@ const textFieldsMetadata = {
     description: 'ناوی خاوەنی مافی یاسایی.',
   },
   dateCopyrighted: {
-    title: 'بەرواری مافی چاپ',
+    title: 'ڕێکەوتی مافی چاپ',
     description: 'ساڵی تۆمارکردنی مافی چاپ.',
   },
   availability: {

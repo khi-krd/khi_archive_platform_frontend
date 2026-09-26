@@ -382,7 +382,7 @@ const FULL_MEDIA_FIELD_GROUPS = {
       fields: ['language', 'dialect', 'recordingVenue', 'city', 'region'],
     },
     {
-      title: 'Dates (بەروارەکان)',
+      title: 'Dates (ڕێکەوتەکان)',
       icon: IconLayers,
       fields: ['dateCreated', 'datePublished', 'dateModified'],
     },
@@ -458,7 +458,7 @@ const FULL_MEDIA_FIELD_GROUPS = {
       fields: ['tags', 'keywords'],
     },
     {
-      title: 'Dates (بەروارەکان)',
+      title: 'Dates (ڕێکەوتەکان)',
       icon: IconLayers,
       fields: ['dateCreated', 'dateModified', 'datePublished'],
     },
@@ -530,7 +530,7 @@ const FULL_MEDIA_FIELD_GROUPS = {
       fields: ['tags', 'keywords'],
     },
     {
-      title: 'Dates (بەروارەکان)',
+      title: 'Dates (ڕێکەوتەکان)',
       icon: IconLayers,
       fields: ['dateCreated', 'dateModified', 'datePublished'],
     },
@@ -594,7 +594,7 @@ const FULL_MEDIA_FIELD_GROUPS = {
       fields: ['tags', 'keywords'],
     },
     {
-      title: 'Dates (بەروارەکان)',
+      title: 'Dates (ڕێکەوتەکان)',
       icon: IconLayers,
       fields: ['dateCreated', 'printDate', 'dateModified', 'datePublished'],
     },
@@ -754,24 +754,27 @@ function KhiPublicMediaFields({ kind, item, full = false }) {
       {groups.map((group) => {
         const fields = group.fields.filter((field) => full || !displayedOutside.has(field))
         if (!fields.length) return null
+        // Resolve every field once — for guests (full=false) an empty/null
+        // field never renders, and a group whose fields are all empty
+        // collapses entirely so visitors only see real information.
+        const rows = fields.map((field) => {
+          const value = valueFrom(item, field, { aliases: FIELD_ALIASES, keepEmpty: full })
+          const values = normalizeValue(value, { detailed: full })
+          return { field, values, empty: isEmptyValue(value) || !values.length }
+        }).filter((row) => full || !row.empty)
+        if (!rows.length) return null
         return (
           <div className="meta-panel media-field-group" key={group.title}>
             <p className="meta-panel-title">
               <GroupTitle title={group.title} />
             </p>
             <dl className="meta-rows">
-              {fields.map((field) => {
-                const value = valueFrom(item, field, { aliases: FIELD_ALIASES, keepEmpty: full })
-                const values = normalizeValue(value, { detailed: full })
-                const empty = isEmptyValue(value) || !values.length
-                const isLong = !empty && isLongRendering(values)
-                return (
-                  <div className={`meta-row full-field-row${isLong ? ' is-long' : ''}${empty ? ' is-empty-value' : ''}`} key={field}>
-                    <dt><FieldLabel field={field} kind={normalizedKind} /></dt>
-                    <dd><PublicFieldValue values={values} /></dd>
-                  </div>
-                )
-              })}
+              {rows.map(({ field, values, empty }) => (
+                <div className={`meta-row full-field-row${!empty && isLongRendering(values) ? ' is-long' : ''}${empty ? ' is-empty-value' : ''}`} key={field}>
+                  <dt><FieldLabel field={field} kind={normalizedKind} /></dt>
+                  <dd><PublicFieldValue values={values} /></dd>
+                </div>
+              ))}
             </dl>
           </div>
         )

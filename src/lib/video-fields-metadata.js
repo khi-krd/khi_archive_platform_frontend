@@ -161,15 +161,15 @@ const videoFieldsMetadata = {
 
   // ── Dates ─────────────────────────────────────────────────────────
   dateCreated: {
-    title: 'بەرواری دروستکردن',
+    title: 'ڕێکەوتی دروستکردن',
     description: 'ڕۆژی سەرەتایی دروستکردنی ڤیدیۆکە.',
   },
   datePublished: {
-    title: 'بەرواری بڵاوکردنەوە',
+    title: 'ڕێکەوتی بڵاوکردنەوە',
     description: 'ڕۆژی بڵاوکردنەوەی فەرمی، ئەگەر هەبێت.',
   },
   dateModified: {
-    title: 'بەرواری گۆڕانکاری',
+    title: 'ڕێکەوتی گۆڕانکاری',
     description: 'دوایین جار کە ڤیدیۆ یان زانیارییەکانی گۆڕاون.',
   },
 
@@ -241,7 +241,7 @@ const videoFieldsMetadata = {
     description: 'ناوی کەس یان دامەزراوەی خاوەنی مافی یاسایی.',
   },
   dateCopyrighted: {
-    title: 'بەرواری مافی چاپ',
+    title: 'ڕێکەوتی مافی چاپ',
     description: 'ساڵی تۆمارکردنی مافی چاپ.',
   },
   availability: {

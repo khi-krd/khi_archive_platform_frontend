@@ -485,7 +485,7 @@ const FIELD_LABELS_KU = {
   description: 'وەسف',
   duration: 'ماوە',
   year: 'ساڵ',
-  date: 'بەروار',
+  date: 'ڕێکەوت',
   category: 'پۆل',
   project: 'پڕۆژە',
   code: 'کۆد',

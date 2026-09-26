@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { AudioPlayer } from '@/components/ui/audio-player'
 import { HelpUsDialog } from '@/components/public/HelpUsDialog'
 import {
-  mediaThumbHref, pickMediaTitle, extractPersonFromItem, personImageSrc,
+  pickMediaTitle, extractPersonFromItem,
 } from '@/components/public/public-helpers'
 import { DETAIL, yearNum } from '@/components/khi/khi-data'
 import KhiMediaDetail from '@/components/khi/KhiMediaDetail'
@@ -89,17 +89,18 @@ function PublicAudioDetailPage() {
   const original = originalCandidate && originalCandidate !== title ? originalCandidate : null
   const projectCode = audio.project?.projectCode || audio.projectCode
 
+  const media = playbackSrc ? (
+    <div className="player-mount protected-media">
+      <AudioPlayer src={playbackSrc} title={title} subtitle={audio.form || audio.language || ''} protectedMode />
+    </div>
+  ) : isStaff && staffAudio.loading ? (
+    <div className="media-unavailable">…</div>
+  ) : (
+    <div className="media-unavailable">{DETAIL.fileUnavailable}</div>
+  )
+
   const content = (
     <>
-      {playbackSrc ? (
-        <div className="player-mount protected-media" style={{ marginBottom: 22 }}>
-          <AudioPlayer src={playbackSrc} title={title} subtitle={audio.form || audio.language || ''} protectedMode />
-        </div>
-      ) : isStaff && staffAudio.loading ? (
-        <div className="media-unavailable">…</div>
-      ) : (
-        <div className="media-unavailable">{DETAIL.fileUnavailable}</div>
-      )}
       {audio.lyrics ? <KhiContentCard icon={IconQuote} title={DETAIL.lyrics}><p>{audio.lyrics}</p></KhiContentCard> : null}
       {audio.transcription ? <KhiContentCard icon={IconText} title={DETAIL.transcription}><p>{audio.transcription}</p></KhiContentCard> : null}
     </>
@@ -121,11 +122,9 @@ function PublicAudioDetailPage() {
       <HelpUsDialog open={helpOpen} onOpenChange={setHelpOpen} mediaType="AUDIO" mediaCode={code} mediaTitle={title} mediaData={audio} />
       <KhiDetailShell>
         <KhiMediaDetail
-          kind="audio"
           title={title}
           subtitle={original}
           description={audio.description}
-          image={mediaThumbHref(audio) || personImageSrc(person)}
           tags={toList(audio.tags)}
           breadcrumbItems={[
             { to: '/public', label: DETAIL.home },
@@ -137,6 +136,7 @@ function PublicAudioDetailPage() {
           ] : []}
           helpAction={{ label: DETAIL.help, onClick: () => setHelpOpen(true) }}
           footerYear={yearNum(audio)}
+          media={media}
           content={content}
           meta={meta}
         />

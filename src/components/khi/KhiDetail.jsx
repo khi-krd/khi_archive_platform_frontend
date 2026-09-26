@@ -219,6 +219,29 @@ export function KhiDetailHero({
   )
 }
 
+// ── Media-detail head ────────────────────────────────────────────────────────
+// The media pages lead with the file itself; this is the plain identity band
+// that follows it — no gradient card, no disc, just the work's title, summary,
+// tags and page actions in the heritage type scale.
+export function KhiDetailHead({ title, subtitle, description, tags = [], action }) {
+  const cleanTags = (tags || []).filter(Boolean)
+  return (
+    <header className="detail-head">
+      <h1>{title}</h1>
+      {subtitle ? <h2>{subtitle}</h2> : null}
+      {description ? <p className="detail-desc">{description}</p> : null}
+      {cleanTags.length ? (
+        <div className="detail-head-tags">
+          {cleanTags.map((t, i) => (
+            <Link key={`${t}-${i}`} to={publicSearchHref(t)} className="hero-tag">{t}</Link>
+          ))}
+        </div>
+      ) : null}
+      {action ? <div className="detail-head-actions">{action}</div> : null}
+    </header>
+  )
+}
+
 // (KhiInfoGrid was removed: the info-card strip repeated facts that the
 // metadata ledger, hero and section cards already carry.)
 

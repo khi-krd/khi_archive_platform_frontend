@@ -20,7 +20,6 @@ import { IconLayers, IconText, IconQuote } from '@/components/khi/icons'
 import { guestTexts } from '@/services/guest'
 import { getStaffMediaOne } from '@/services/staff-public-catalog'
 import { usePublicAccess } from '@/hooks/use-public-access'
-import { useAuthedMediaUrl } from '@/hooks/use-authed-media-url'
 import { decodePublicCode, isEncodedPublicCode, publicDetailPath } from '@/components/public/public-route-id'
 import { apiClient } from '@/lib/api-client'
 import { resolveMediaUrl } from '@/lib/media-url'
@@ -357,8 +356,6 @@ function PublicTextDetailPage() {
   // Staff previewing the public site get an admin-shaped, Bearer-protected
   // cover URL — a plain <img src> can't authenticate, so fetch it as a blob
   // instead. Guests keep the already-correct, unauthenticated guest path.
-  const staffCover = useAuthedMediaUrl(text?.coverImageUrl, { enabled: isStaff })
-
   if (loading || error || !text) {
     return <KhiDetailShell loading={loading} error={error} notFound={!text} />
   }
@@ -373,26 +370,27 @@ function PublicTextDetailPage() {
   const docKind = resolveDocKind(text.extension, text.fileName, text.textFileUrl)
   const projectCode = text.project?.projectCode || text.projectCode
 
+  const media = text.textFileUrl ? (
+    docKind === 'pdf' ? (
+      <TextPdfPageImagesViewer key={fileUrl} fileUrl={fileUrl} title={title} />
+    ) : docKind === 'unsupported' ? (
+      <SniffedDocViewer key={fileUrl} fileUrl={text.textFileUrl} fileName={text.fileName} title={title} />
+    ) : (
+      <DocumentContentReader
+        key={text.textFileUrl}
+        variant="khi"
+        fileUrl={text.textFileUrl}
+        extension={text.extension}
+        fileName={text.fileName}
+        title={title}
+      />
+    )
+  ) : (
+    <div className="media-unavailable">{DETAIL.fileUnavailable}</div>
+  )
+
   const content = (
     <>
-      {text.textFileUrl ? (
-        docKind === 'pdf' ? (
-          <TextPdfPageImagesViewer key={fileUrl} fileUrl={fileUrl} title={title} />
-        ) : docKind === 'unsupported' ? (
-          <SniffedDocViewer key={fileUrl} fileUrl={text.textFileUrl} fileName={text.fileName} title={title} />
-        ) : (
-          <DocumentContentReader
-            key={text.textFileUrl}
-            variant="khi"
-            fileUrl={text.textFileUrl}
-            extension={text.extension}
-            fileName={text.fileName}
-            title={title}
-          />
-        )
-      ) : (
-        <div className="media-unavailable">{DETAIL.fileUnavailable}</div>
-      )}
       {text.summary ? <KhiContentCard icon={IconQuote} title={DETAIL.summary}><p>{text.summary}</p></KhiContentCard> : null}
       {text.bodyText ? <KhiContentCard icon={IconText} title={DETAIL.body}><p>{text.bodyText}</p></KhiContentCard> : null}
     </>
@@ -414,11 +412,9 @@ function PublicTextDetailPage() {
       <HelpUsDialog open={helpOpen} onOpenChange={setHelpOpen} mediaType="TEXT" mediaCode={code} mediaTitle={title} mediaData={text} />
       <KhiDetailShell>
         <KhiMediaDetail
-          kind="text"
           title={title}
           subtitle={original}
           description={text.description || text.summary}
-          image={(isStaff ? staffCover.url : resolveMediaUrl(text.coverImageUrl)) || null}
           tags={toList(text.tags)}
           breadcrumbItems={[
             { to: '/public', label: DETAIL.home },
@@ -430,6 +426,7 @@ function PublicTextDetailPage() {
           ] : []}
           helpAction={{ label: DETAIL.help, onClick: () => setHelpOpen(true) }}
           footerYear={yearNum(text)}
+          media={media}
           content={content}
           meta={meta}
         />
