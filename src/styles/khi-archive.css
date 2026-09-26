@@ -252,21 +252,12 @@
 .khi-root .sidebar::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
 .khi-root .sidebar::-webkit-scrollbar-track{background:transparent}
 
-/* ── Results panel (desktop ≥1025px) ──────────────────────────────────────────
-   Mirror the filter rail: the results column is a viewport-tall panel whose card
-   GRID scrolls inside itself, while the pager is pinned at the column's foot —
-   always visible, just before the footer, and never inside the scroll area. The
-   toolbar + active-chips stay fixed at the top of the panel. On ≤1024px the
-   sidebar is hidden and this collapses back to normal page flow. */
-@media(min-width:1025px){
-  .khi-root .catalogue-main{position:sticky;top:84px;height:calc(100dvh - 96px);display:flex;flex-direction:column;min-height:0}
-  .khi-root .catalogue-main > .toolbar,.khi-root .catalogue-main > .active-chips{flex-shrink:0}
-  .khi-root .results-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding-top:6px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
-  .khi-root .results-scroll::-webkit-scrollbar{width:9px}
-  .khi-root .results-scroll::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
-  .khi-root .results-scroll::-webkit-scrollbar-track{background:transparent}
-  .khi-root .catalogue-main > .pager{flex-shrink:0;margin-top:0;padding-top:16px;border-top:1px solid var(--line)}
-}
+/* ── Results panel ─────────────────────────────────────────────────────────
+   Plain page flow: the card list scrolls with the WINDOW on every screen —
+   no inner scroll pane. The sticky filter rail alongside still pins itself
+   while the results pass underneath it. */
+.khi-root .catalogue-main{min-width:0}
+.khi-root .results-scroll{padding-top:6px}
 /* The rail has no text heading. Its head row is a 42px spacer on desktop — the
    toolbar's filter+sort cluster glides onto it while the rail is open — and on
    phones it carries the drawer's own close control (the filter icon). */
@@ -332,11 +323,15 @@
    badges the live-filter count. */
 .khi-root .filters-toggle{display:inline-flex;align-items:center;gap:9px;flex-shrink:0;height:42px;padding:0 16px;border-radius:4px;border:1px solid var(--line-2);background:#fff;color:var(--ink-soft);font-weight:700;font-size:14px;transition:.16s}
 .khi-root .filters-toggle svg{width:16px;height:16px}
-.khi-root .filters-toggle:hover{border-color:var(--pine);color:var(--pine);background:var(--paper-3)}
+/* Closed: white — hovering turns it pine with a white funnel + badge. */
+.khi-root .filters-toggle:hover{border-color:var(--pine);background:var(--pine);color:#fff}
+.khi-root .filters-toggle:hover .cnt{background:#fff;color:var(--pine)}
+/* Open: solid pine — hovering flips it back to the closed (white) look. */
 .khi-root .filters-toggle.on{border-color:var(--pine);color:#fff;background:var(--pine)}
-.khi-root .filters-toggle.on:hover{border-color:var(--pine-deep);background:var(--pine-deep);color:#fff}
-.khi-root .filters-toggle .cnt{display:inline-grid;place-items:center;min-width:19px;height:19px;padding:0 6px;border-radius:4px;background:var(--pine);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;direction:ltr}
 .khi-root .filters-toggle.on .cnt{background:#fff;color:var(--pine)}
+.khi-root .filters-toggle.on:hover{border-color:var(--line-2);background:#fff;color:var(--ink-soft)}
+.khi-root .filters-toggle.on:hover .cnt{background:var(--pine);color:#fff}
+.khi-root .filters-toggle .cnt{display:inline-grid;place-items:center;min-width:19px;height:19px;padding:0 6px;border-radius:4px;background:var(--pine);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;direction:ltr}
 .khi-root .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .khi-root .toggle{display:flex;background:var(--paper-2);border:1px solid var(--line-2);border-radius:4px;padding:3px;gap:3px}
 .khi-root .toggle button{display:flex;align-items:center;gap:7px;padding:8px 15px;border-radius:3px;font-weight:600;font-size:13.5px;color:var(--ink-muted);transition:.18s}

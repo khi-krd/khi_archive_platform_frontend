@@ -382,10 +382,11 @@ export function KhiBrowsePage() {
   }, [queryKey, page, pageSize, accessReady, isStaff])
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  // On a NEW query (not when appending), reset the internal scroll so the user
+  // On a NEW query (not when appending), reset the scroll so the user
   // starts at the top; "Show more" keeps the scroll position so the list grows.
   useEffect(() => {
     if (resultsRef.current) resultsRef.current.scrollTop = 0
+    window.scrollTo(0, 0)
   }, [queryKey])
 
   const cards = useMemo(() => items.map((it) => cardFromItem(it, typeKey)), [items, typeKey])
@@ -548,8 +549,8 @@ export function KhiBrowsePage() {
             </div>
           ) : null}
 
-          {/* Only the card grid scrolls (desktop): the show-more control stays
-              inside the results column, just after the loaded cards. */}
+          {/* The card list scrolls with the page (plain window scroll); the
+              show-more control sits just after the loaded cards. */}
           <div className="results-scroll" ref={resultsRef}>
             {loading ? (
               <SkeletonGrid />

@@ -23,14 +23,16 @@ import {
 import { publicDetailPath } from '@/components/public/public-route-id'
 import { resolveMediaUrl } from '@/lib/media-url'
 
-export const PAGE_SIZE = 12
+// Every catalogue scope fetches 100 per batch; "زیاتر پیشانبدە" appends
+// the next 100 on each click.
+export const PAGE_SIZE = 100
 export const TYPE_PAGE_SIZES = {
-  audio: 50,
-  video: 50,
-  text: 50,
-  image: 50,
-  person: 50,
-  project: 50,
+  audio: 100,
+  video: 100,
+  text: 100,
+  image: 100,
+  person: 100,
+  project: 100,
   category: 100,
 }
 // The public media grid is the landing — no "all results" nav button.
