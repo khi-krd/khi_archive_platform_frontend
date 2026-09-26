@@ -541,8 +541,8 @@ function HelpUsDialog({ open, onOpenChange, mediaType, mediaCode, mediaTitle, me
           <div className="flex min-w-0 items-center gap-3.5">
             <KhiLogo className="size-12" />
             <div className="min-w-0">
-              <h2 id={titleId} className="font-heading text-[26px] font-bold leading-tight text-foreground">{KU.title}</h2>
-              <p id={descId} className="mt-1 line-clamp-1 text-[13.5px] text-muted-foreground">
+              <h2 id={titleId} className="font-heading text-[15px] font-bold leading-tight text-muted-foreground">{KU.title}</h2>
+              <p id={descId} className="mt-1 line-clamp-2 font-heading text-[22px] font-bold leading-snug text-foreground">
                 {mediaTitle || KU.subtitle}
               </p>
             </div>
