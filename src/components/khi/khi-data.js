@@ -52,7 +52,7 @@ export const UI = {
   brand: 'ئینستیتیوتی کەلەپووری کورد',
   brandSub: 'کاتالۆگی گشتی',
   org: 'دەزگای کەلەپووری کوردی',
-  searchPlaceholder: 'لە گەنجیینەکەدا بگەڕێ بەپێی - بابەت ، کەس ، زمان و میدیاکان ........',
+  searchPlaceholder: 'گەڕان ...',
   heroSearchPlaceholder: 'بگەڕێ بەناو گەنجینەکەدا — ناونیشان، کەس، دەنگبێژ…',
   profile: 'هەژمارەکەم',
   dashboard: 'داشبۆرد',
@@ -204,22 +204,24 @@ const FEED_FACETS = [
   { paramKey: 'dialect', facetKey: 'dialects', title: 'زاراوە' },
 ]
 
+// نوێترین/کۆنترین order by the work's PUBLISHMENT date (datePublished),
+// not when the row was entered — the separate بڵاوکراوە entries were
+// removed because newest IS the publish order now. هاوتاگ sits last: it
+// regroups the whole result set by shared tag (see lib/tag-order.js), so
+// it's handled client-side rather than as a backend sort field.
 const MEDIA_SORTS = [
-  { key: 'date', dir: 'desc', label: 'نوێترین' },
-  { key: 'date', dir: 'asc', label: 'کۆنترین' },
-  { key: 'datePublished', dir: 'desc', label: 'بڵاوکراوە نوێترین' },
-  { key: 'datePublished', dir: 'asc', label: 'بڵاوکراوە کۆنترین' },
+  { key: 'datePublished', dir: 'desc', label: 'نوێترین' },
+  { key: 'datePublished', dir: 'asc', label: 'کۆنترین' },
   { key: 'title', dir: 'asc', label: 'ناونیشان ↑' },
   { key: 'title', dir: 'desc', label: 'ناونیشان ↓' },
+  { key: 'tag', dir: 'asc', label: 'هاوتاگ' },
 ]
 const ALL_SORTS = [
-  { key: 'relevance', dir: 'desc', label: 'پەیوەندیدار' },
-  { key: 'date', dir: 'desc', label: 'نوێترین' },
-  { key: 'date', dir: 'asc', label: 'کۆنترین' },
-  { key: 'datePublished', dir: 'desc', label: 'بڵاوکراوە نوێترین' },
-  { key: 'datePublished', dir: 'asc', label: 'بڵاوکراوە کۆنترین' },
+  { key: 'datePublished', dir: 'desc', label: 'نوێترین' },
+  { key: 'datePublished', dir: 'asc', label: 'کۆنترین' },
   { key: 'title', dir: 'asc', label: 'ناونیشان ↑' },
   { key: 'title', dir: 'desc', label: 'ناونیشان ↓' },
+  { key: 'tag', dir: 'asc', label: 'هاوتاگ' },
 ]
 const BASIC_SORTS = [
   { key: 'createdAt', dir: 'desc', label: 'نوێترین' },

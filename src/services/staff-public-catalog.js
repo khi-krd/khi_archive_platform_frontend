@@ -6,6 +6,7 @@ import { getText } from '@/services/text'
 import { getProject, getProjectsPage } from '@/services/project'
 import { getCategory, getCategoriesPage } from '@/services/category'
 import { getPerson, getPersonsPage } from '@/services/person'
+import { orderBySharedTag } from '@/lib/tag-order'
 
 const MEDIA_KINDS = ['image', 'audio', 'video', 'text']
 const ENTITY_KINDS = ['project', 'person', 'category']
@@ -93,7 +94,9 @@ function dateParam(value) {
 
 function staffSort(sortBy) {
   if (sortBy === 'title') return 'title'
-  if (sortBy === 'datePublished') return 'createdAt'
+  // datePublished / tag are client-side orderings (see needsClientMediaFiltering),
+  // so the bulk fetch just needs a safe key the items feed understands.
+  if (sortBy === 'datePublished' || sortBy === 'tag') return 'createdAt'
   if (sortBy === 'date' || sortBy === 'relevance') return 'createdAt'
   return sortBy || 'createdAt'
 }
@@ -122,6 +125,10 @@ const SERVER_ITEM_FILTERS = new Set([
 ])
 
 function needsClientMediaFiltering(params) {
+  // Orderings the items feed can't express: هاوتاگ regroups by shared tag and
+  // نوێترین/کۆنترین now mean the PUBLISHMENT date (datePublished), not the
+  // database row timestamps /items can sort — both are computed client-side.
+  if (['tag', 'datePublished', 'date'].includes(params?.sortBy)) return true
   return Object.entries(params || {}).some(([key, value]) => {
     if (SERVER_ITEM_FILTERS.has(key) || value == null || value === '') return false
     return asArray(value).length > 0
@@ -220,15 +227,26 @@ function titleOf(row) {
 }
 
 function sortRows(rows, sortBy, direction) {
+  // هاوتاگ: tag group → image→audio→video→text → title (see lib/tag-order.js).
+  if (sortBy === 'tag') return orderBySharedTag(rows)
   const sign = direction === 'asc' ? 1 : -1
   const copy = [...rows]
   copy.sort((a, b) => {
     if (sortBy === 'title') {
       return String(titleOf(a)).localeCompare(String(titleOf(b)), undefined, { sensitivity: 'base' }) * sign
     }
-    const aTime = new Date(sortBy === 'datePublished' ? (a.datePublished || rowDate(a)) : rowDate(a)).getTime()
-    const bTime = new Date(sortBy === 'datePublished' ? (b.datePublished || rowDate(b)) : rowDate(b)).getTime()
-    return ((Number.isFinite(aTime) ? aTime : 0) - (Number.isFinite(bTime) ? bTime : 0)) * sign
+    // 'date'/'datePublished' both mean the publishment date here — fall back
+    // to the archival date so undated records stay comparable. Rows with no
+    // usable date land at the far end in both directions.
+    const usePublished = sortBy === 'datePublished' || sortBy === 'date'
+    const aTime = new Date(usePublished ? (a.datePublished || rowDate(a)) : rowDate(a)).getTime()
+    const bTime = new Date(usePublished ? (b.datePublished || rowDate(b)) : rowDate(b)).getTime()
+    const aVal = Number.isFinite(aTime) ? aTime : null
+    const bVal = Number.isFinite(bTime) ? bTime : null
+    if (aVal == null && bVal == null) return 0
+    if (aVal == null) return 1
+    if (bVal == null) return -1
+    return (aVal - bVal) * sign
   })
   return copy
 }

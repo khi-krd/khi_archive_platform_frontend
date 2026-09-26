@@ -5,6 +5,7 @@ import { HighlightProvider } from '@/components/ui/highlight'
 import { readFacet, readMediaTypeCount, decodeSelectedFacets } from '@/components/public/public-helpers'
 import { guestAudios, guestFacets, guestImages, guestTexts, guestVideos } from '@/services/guest'
 import { getStaffBrowsePage, getStaffMediaPage } from '@/services/staff-public-catalog'
+import { orderBySharedTag } from '@/lib/tag-order'
 import { usePublicAccess } from '@/hooks/use-public-access'
 import KhiSidebar from '@/components/khi/KhiSidebar'
 import KhiToolbar from '@/components/khi/KhiToolbar'
@@ -45,6 +46,85 @@ function emptyMediaPage(page, size) {
     first: page === 0,
     last: true,
     empty: true,
+  }
+}
+
+// Bulk size + a hard page cap for the هاوتاگ path — it has to see the WHOLE
+// filtered result set to group shared tags, so it pages each selected kind
+// through the normal guest endpoints and orders locally.
+const TAG_SORT_BULK_SIZE = 500
+const TAG_SORT_MAX_PAGES = 10
+
+async function fetchAllMediaRows(kind, params) {
+  const api = MEDIA_APIS[kind]
+  if (!api) return []
+  // The tag ordering is computed locally — the per-kind API only has to
+  // return the filtered rows; a 'tag' sortBy would be unknown to it.
+  const rest = { ...params }
+  delete rest.sortBy
+  delete rest.sortDirection
+  delete rest.page
+  delete rest.size
+  const rows = []
+  let page = 0
+  let totalPages = 1
+  do {
+    if (params.signal?.aborted) break
+    const data = await api({ ...rest, page, size: TAG_SORT_BULK_SIZE })
+    const content = data?.content || []
+    rows.push(...content)
+    const reported = Number(data?.totalPages)
+    totalPages = Number.isFinite(reported) && reported >= 0
+      ? reported
+      : (content.length < TAG_SORT_BULK_SIZE ? page + 1 : page + 2)
+    page += 1
+  } while (page < totalPages && page < TAG_SORT_MAX_PAGES)
+  return rows.map((row) => ({ ...row, kind }))
+}
+
+// هاوتاگ ordering spans all four media kinds (tag group → image→audio→
+// video→text → title), which no single per-type endpoint can produce — so
+// the guest path gathers every filtered row, orders it once, then slices
+// the requested page locally. The ordered list is cached per query so a
+// "show more" click re-slices without refetching every kind again.
+const tagOrderCache = new Map()
+const TAG_ORDER_CACHE_MAX = 4
+
+function tagOrderCacheKey(kinds, params) {
+  const rest = { ...params }
+  delete rest.signal
+  delete rest.page
+  delete rest.size
+  delete rest.sortBy
+  delete rest.sortDirection
+  return `${kinds.join(',')}|${JSON.stringify(rest)}`
+}
+
+async function loadTagOrderedMediaPage(params, selectedKinds) {
+  const kinds = selectedKinds.length ? selectedKinds.filter((k) => MEDIA_APIS[k]) : MEDIA_KINDS
+  const size = params.size || 50
+  const page = params.page || 0
+  const cacheKey = tagOrderCacheKey(kinds, params)
+  let ordered = tagOrderCache.get(cacheKey)
+  if (!ordered) {
+    const collected = []
+    for (const kind of kinds) {
+      collected.push(...await fetchAllMediaRows(kind, params))
+    }
+    ordered = orderBySharedTag(collected)
+    // A partial list from an aborted fetch must not poison the cache.
+    if (!params.signal?.aborted) {
+      if (tagOrderCache.size >= TAG_ORDER_CACHE_MAX) {
+        tagOrderCache.delete(tagOrderCache.keys().next().value)
+      }
+      tagOrderCache.set(cacheKey, ordered)
+    }
+  }
+  return {
+    items: ordered.slice(page * size, page * size + size),
+    totalElements: ordered.length,
+    totalPages: ordered.length ? Math.ceil(ordered.length / size) : 0,
+    number: page,
   }
 }
 
@@ -146,13 +226,18 @@ export function KhiBrowsePage() {
     [type],
   )
 
-  // Default sort: "relevance" only earns its place when there's a query —
-  // otherwise lead with Newest (the catalogue's natural landing order).
-  const defaultSort = (!q && type.sorts.some((s) => s.key === 'date'))
-    ? (type.sorts.find((s) => s.key === 'date' && s.dir === 'desc') || type.sorts[0])
-    : type.sorts[0]
-  const sortBy = searchParams.get('sortBy') || defaultSort.key
-  const sortDir = searchParams.get('sortDirection') || defaultSort.dir
+  // Default sort: newest by publishment date — the catalogue's natural
+  // landing order with or without a query. هاوتاگ / title are opt-in.
+  const defaultSort =
+    type.sorts.find((s) => s.dir === 'desc' && ['datePublished', 'createdAt', 'date'].includes(s.key))
+    || type.sorts[0]
+  // Legacy URLs may still carry the retired keys: date → the new publishment
+  // sort; relevance/anything-unknown → the default.
+  const rawSortKey = searchParams.get('sortBy')
+  const rawSortDir = searchParams.get('sortDirection')
+  const normalizedSortKey = rawSortKey === 'date' ? 'datePublished' : rawSortKey
+  const sortBy = type.sorts.some((s) => s.key === normalizedSortKey) ? normalizedSortKey : defaultSort.key
+  const sortDir = sortBy === normalizedSortKey && rawSortDir ? rawSortDir : defaultSort.dir
   const sortIndex = Math.max(0, type.sorts.findIndex((s) => s.key === sortBy && s.dir === sortDir))
 
   const selected = useMemo(() => decodeSelectedFacets(searchParams, filterGroups), [searchParams, filterGroups])
@@ -266,9 +351,16 @@ export function KhiBrowsePage() {
       if (!Array.isArray(list) || !list.length) continue
       params[group.paramKey] = list
     }
-    const request = typeKey === 'all'
-      ? loadPublicMediaSections(params, selectedMediaTypes, isStaff)
-      : (isStaff ? getStaffBrowsePage(typeKey, params) : type.api(params))
+    // هاوتاگ needs a cross-kind order no single endpoint can produce, so
+    // guests gather every filtered row and order locally. Staff rows get
+    // the same treatment inside the staff catalog service.
+    const guestTagOrder =
+      !isStaff && sortBy === 'tag' && (typeKey === 'all' || Boolean(MEDIA_APIS[typeKey]))
+    const request = guestTagOrder
+      ? loadTagOrderedMediaPage(params, typeKey === 'all' ? selectedMediaTypes : [typeKey])
+      : typeKey === 'all'
+        ? loadPublicMediaSections(params, selectedMediaTypes, isStaff)
+        : (isStaff ? getStaffBrowsePage(typeKey, params) : type.api(params))
 
     request
       .then((res) => {

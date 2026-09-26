@@ -37,6 +37,69 @@ export default function KhiHeader() {
   const profileButtonRef = useRef(null)
   const profileMenuRef = useRef(null)
 
+  // Sticky bar that slides away while scrolling down and returns on scroll
+  // up — same feel as the website header (top of page always shows it,
+  // sub-pixel jitter ignored, reduced-motion users keep it pinned).
+  const [navHidden, setNavHidden] = useState(false)
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) return undefined
+
+    const AT_TOP = 96      // near the top the bar is always visible
+    const HIDE_AFTER = 96  // don't hide until past the header band
+    const DELTA = 4        // ignore jitter so the bar doesn't flicker
+    // Per-scroller baselines: the document and the results pane scroll
+    // independently, so each keeps its own last position for the delta.
+    const lastY = new WeakMap()
+    lastY.set(document, Math.max(0, window.scrollY))
+    let ticking = false
+
+    const scrollTop = (target) => {
+      if (
+        !target || target === document || target === document.documentElement ||
+        target === document.body || target === window
+      ) {
+        return Math.max(0, window.scrollY)
+      }
+      return Math.max(0, target.scrollTop || 0)
+    }
+
+    const update = (target) => {
+      ticking = false
+      const key = target instanceof Element ? target : document
+      const y = scrollTop(target)
+      if (y <= AT_TOP) {
+        setNavHidden(false)
+        lastY.set(key, y)
+        return
+      }
+      const delta = y - (lastY.get(key) ?? y)
+      if (Math.abs(delta) < DELTA) return
+      setNavHidden(delta > 0 && y > HIDE_AFTER)
+      lastY.set(key, y)
+    }
+
+    const onScroll = (event) => {
+      const target = event.target
+      // Only page-level scrolling moves the bar: the document itself, and
+      // the catalogue's inner results pane (the scrollable on desktop).
+      // Sidebar/facet/dropdown scrolling must not nudge the navbar.
+      const isPageScroll =
+        target === document || target === document.documentElement || target === document.body
+      const isResultsPane =
+        target instanceof Element && target.classList?.contains('results-scroll')
+      if (!isPageScroll && !isResultsPane) return
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => update(target))
+    }
+
+    // Scroll events don't bubble — capturing on the document also hears the
+    // catalogue's inner results pane, which is the scrollable on desktop.
+    document.addEventListener('scroll', onScroll, true)
+    return () => document.removeEventListener('scroll', onScroll, true)
+  }, [])
+
   const submit = (event) => {
     event?.preventDefault()
     const term = q.trim()
@@ -78,7 +141,7 @@ export default function KhiHeader() {
   }, [profileOpen])
 
   return (
-    <header className="nav">
+    <header className={`nav${navHidden ? ' nav-hidden' : ''}`}>
       <div className="wrap">
         <Link className="brand" to="/public">
           <KhiLogo className="mark" priority />
