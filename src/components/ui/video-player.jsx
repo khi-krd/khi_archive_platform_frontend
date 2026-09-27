@@ -56,6 +56,9 @@ function VideoPlayer({ src, title, subtitle, className, protectedMode = false })
   const [hover, setHover] = useState(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isPip, setIsPip] = useState(false)
+  // Intrinsic video aspect (w/h) — the surface shrink-wraps it so vertical
+  // and square footage play without black side bars.
+  const [mediaRatio, setMediaRatio] = useState(null)
   // The player root is pinned to dir="ltr", matching the audio player. Keep a
   // single constant for scrubber math so elapsed time always grows left→right
   // inside the RTL public catalogue.
@@ -84,6 +87,7 @@ function VideoPlayer({ src, title, subtitle, className, protectedMode = false })
     setDuration(0)
     setBuffered(0)
     setPlaying(false)
+    setMediaRatio(null)
 
     const updateDuration = () => {
       const d = el.duration
@@ -92,6 +96,7 @@ function VideoPlayer({ src, title, subtitle, className, protectedMode = false })
     const onLoaded = () => {
       updateDuration()
       setReady(true)
+      if (el.videoWidth > 0 && el.videoHeight > 0) setMediaRatio(el.videoWidth / el.videoHeight)
     }
     const onCanPlay = () => setReady(true)
     const onTime = () => {
@@ -377,8 +382,14 @@ function VideoPlayer({ src, title, subtitle, className, protectedMode = false })
         </div>
       )}
 
-      {/* Video surface */}
-      <div className="relative aspect-video w-full overflow-hidden bg-black">
+      {/* Video surface — sized to the footage's own aspect, so there is no
+          black letterbox; capped at 78vh and centred when narrow. */}
+      <div
+        className="relative w-full overflow-hidden"
+        style={mediaRatio
+          ? { aspectRatio: mediaRatio, width: `min(100%, calc(${isFullscreen ? '100vh - 190px' : '78vh'} * ${mediaRatio}))`, marginInline: 'auto' }
+          : { aspectRatio: '16 / 9' }}
+      >
         <video
           ref={videoRef}
           preload="metadata"

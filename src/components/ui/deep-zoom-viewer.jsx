@@ -45,7 +45,7 @@ function ControlButton({ onClick, label, children }) {
  * with AudioPlayer/VideoPlayer's `protectedMode`) — it does not, and cannot,
  * make guest-visible content uncopyable.
  */
-function DeepZoomViewer({ src, tileSources, alt = '', className, protectedMode = true, onError }) {
+function DeepZoomViewer({ src, tileSources, alt = '', className, protectedMode = true, onError, onDimensions, fitBox = false }) {
   const rootRef = useRef(null)
   const containerRef = useRef(null)
   const viewerRef = useRef(null)
@@ -88,7 +88,11 @@ function DeepZoomViewer({ src, tileSources, alt = '', className, protectedMode =
     })
     viewerRef.current = viewer
 
-    const handleOpen = () => setLoading(false)
+    const handleOpen = () => {
+      setLoading(false)
+      const size = viewer.world?.getItemAt?.(0)?.getContentSize?.()
+      if (size?.x > 0 && size?.y > 0) onDimensions?.(size.x, size.y)
+    }
     const handleFailed = () => {
       setFailed(true)
       setLoading(false)
@@ -209,7 +213,8 @@ function DeepZoomViewer({ src, tileSources, alt = '', className, protectedMode =
         // handlers need real pointer events to work, so this element always
         // opts back in regardless of what it's nested inside.
         'group/zoom relative overflow-hidden rounded-2xl border bg-muted/20 shadow-sm shadow-black/5 pointer-events-auto cursor-grab active:cursor-grabbing',
-        !isFullscreen && 'min-h-[360px]',
+        fitBox && 'size-full',
+        !isFullscreen && !fitBox && 'min-h-[360px]',
         isFullscreen && 'bg-background',
         className,
       )}
@@ -218,7 +223,7 @@ function DeepZoomViewer({ src, tileSources, alt = '', className, protectedMode =
       role="img"
       aria-label={alt}
     >
-      <div ref={containerRef} className={cn('size-full', !isFullscreen && 'min-h-[360px]')} />
+      <div ref={containerRef} className={cn('size-full', !isFullscreen && !fitBox && 'min-h-[360px]')} />
 
       {protectedMode && !loading && !failed ? (
         <KhiLogoWatermark

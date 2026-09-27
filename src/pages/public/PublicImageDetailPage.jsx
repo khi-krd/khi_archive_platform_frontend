@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { HelpUsDialog } from '@/components/public/HelpUsDialog'
@@ -65,6 +65,10 @@ function PublicImageDetailPage() {
   }, [accessReady, code, isStaff])
 
   const person = useMemo(() => extractPersonFromItem(image), [image])
+  // The stage shrink-wraps the photo's own aspect ratio (capped at 78vh), so
+  // there are no letterbox bars — the viewer box IS the picture.
+  const [dims, setDims] = useState(null)
+  const onImageSize = useCallback((w, h) => setDims((d) => (d?.w === w && d?.h === h ? d : { w, h })), [])
   // Staff previewing the public site get admin-shaped, Bearer-protected URLs
   // (getStaffMediaOne hits the admin /image/{code} endpoint) — a plain
   // DeepZoomViewer <img> can't send that header, so fetch it as an authed
@@ -86,13 +90,18 @@ function PublicImageDetailPage() {
   const media = fileUrl ? (
     <div
       className="media-stage image protected-media"
+      style={dims
+        ? { aspectRatio: `${dims.w} / ${dims.h}`, width: `min(100%, calc(78vh * ${dims.w / dims.h}))`, marginInline: 'auto' }
+        : { aspectRatio: '4 / 3' }}
       onAuxClick={stopProtectedMediaEvent}
       onContextMenu={stopProtectedMediaEvent}
     >
       <DeepZoomViewer
         src={fileUrl}
         alt={title}
-        className="h-[70vh] max-h-[78vh] w-full rounded-none border-0 bg-transparent shadow-none"
+        fitBox
+        onDimensions={onImageSize}
+        className="size-full rounded-none border-0 bg-transparent shadow-none"
       />
     </div>
   ) : isStaff && staffImage.loading ? (
