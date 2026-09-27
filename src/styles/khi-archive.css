@@ -792,7 +792,7 @@
 @media(max-width:1024px){.khi-root .hero-grid{grid-template-columns:1fr;gap:30px}.khi-root .hero-image-area{order:-1}}
 @media(max-width:640px){.khi-root .hero-grid{padding:0 6px}}
 .khi-root .hero-content{max-width:760px;min-width:0}
-.khi-root .type-pill{display:inline-flex;align-items:center;padding:5px 15px;border-radius:999px;background:#fff8e8;border:1px solid #ecdcbe;color:var(--gold);font-family:'IBM Plex Mono',monospace;font-weight:700;letter-spacing:3px;font-size:12px;margin-bottom:16px;direction:ltr}
+.khi-root .type-pill{display:inline-flex;align-items:center;padding:5px 15px;border-radius:999px;background:#fff;border:1px solid var(--line-2);color:var(--pine);font-family:'IBM Plex Mono',monospace;font-weight:700;letter-spacing:3px;font-size:12px;margin-bottom:16px;direction:ltr}
 .khi-root .hero-content h1{margin:0;font-family:'Amiri',serif;font-weight:700;font-size:clamp(34px,3.6vw,56px);line-height:1.26;color:var(--ink);word-break:break-word}
 .khi-root .hero-content h2{margin:12px 0 18px;color:var(--pine);font-size:21px;font-weight:700;line-height:1.6}
 .khi-root .hero-desc{margin:0;color:var(--ink-soft);font-size:16.5px;line-height:2.05;max-width:720px;white-space:pre-line;word-break:break-word}
@@ -820,8 +820,7 @@
 .khi-root .detail-media-lead{margin-bottom:34px}
 .khi-root .detail-media-lead .media-stage,
 .khi-root .detail-media-lead .player-mount{margin-bottom:0}
-.khi-root .detail-head{position:relative;margin-bottom:38px;padding:4px 4px 30px;border-bottom:1px solid var(--line)}
-.khi-root .detail-head::after{content:"";position:absolute;bottom:-1.5px;inset-inline-start:0;width:78px;height:3px;border-radius:3px;background:var(--pine)}
+.khi-root .detail-head{position:relative;margin-bottom:38px;padding:4px 4px 8px}
 .khi-root .detail-head h1{margin:0;font-family:'Amiri',serif;font-weight:700;font-size:clamp(32px,3.4vw,52px);line-height:1.3;color:var(--ink);word-break:break-word}
 .khi-root .detail-head h2{margin:10px 0 16px;color:var(--pine);font-size:20px;font-weight:700;line-height:1.6}
 .khi-root .detail-desc{margin:0;color:var(--ink-soft);font-size:16.5px;line-height:2.05;max-width:780px;white-space:pre-line;word-break:break-word}
@@ -1220,13 +1219,11 @@
 .khi-root .content-body p{margin:0;white-space:pre-line;word-break:break-word}
 .khi-root .content-card .player-mount{margin:0}
 
-/* Lyrics — verse is the artwork: centred lines in the heritage serif with
-   wide breathing room, a pine hairline ornament and no side chrome. */
-.khi-root .content-card.lyrics-card{background:linear-gradient(180deg,#fff 0%,#fbfdfc 100%);border-color:#dce8e0;padding:34px 30px 38px}
-.khi-root .content-card.lyrics-card .content-title{justify-content:center;padding-bottom:0;border-bottom:0;margin-bottom:6px;font-size:22px;color:var(--pine-deep)}
-.khi-root .content-card.lyrics-card .content-body{position:relative;padding-top:30px;text-align:center}
-.khi-root .content-card.lyrics-card .content-body::before{content:"";position:absolute;top:4px;left:50%;transform:translateX(-50%);width:72px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--pine-2),transparent)}
-.khi-root .content-card.lyrics-card .content-body p{max-width:660px;margin-inline:auto;font-family:'Amiri','Vazirmatn',serif;font-size:19px;line-height:2.55;color:#24473c;text-align:center}
+/* Lyrics — plain verse, no box: bare heading + generous line-height text. */
+.khi-root .content-card.lyrics-card{background:none;border:0;border-radius:0;box-shadow:none;padding:0}
+.khi-root .content-card.lyrics-card .content-title{padding-bottom:0;border-bottom:0;margin-bottom:10px;font-family:'Vazirmatn',Tahoma,sans-serif;font-size:15px;font-weight:700;color:var(--pine-deep)}
+.khi-root .content-card.lyrics-card .content-title::after{content:none}
+.khi-root .content-card.lyrics-card .content-body p{font-size:16px;line-height:2.35;color:var(--ink-soft)}
 
 /* ── Media stage (image viewer / pdf) + unavailable note ────────────────── */
 .khi-root .media-stage{display:block;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#0c1611;box-shadow:0 24px 60px -34px rgba(12,44,29,.7);margin-bottom:22px}
@@ -1656,10 +1653,9 @@
 .khi-root .empty{border-radius:4px;border:1.5px dashed var(--line-2);background:linear-gradient(180deg,#fbfdfb,#fff)}
 
 /* ── Detail pages: gilded pills, icons, stages + content flourishes ── */
-.khi-root .type-pill{background:linear-gradient(145deg,#fffdf4,#f9efd8);border-color:rgba(214,178,94,.55);box-shadow:0 6px 14px -10px rgba(150,110,40,.5),inset 0 1px 0 rgba(255,255,255,.7)}
+.khi-root .type-pill{background:#fff;border-color:var(--line-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
 .khi-root .section-ic{border:1px solid rgba(33,112,73,.28);box-shadow:0 10px 20px -14px rgba(25,86,58,.8)}
-.khi-root .content-title{padding-bottom:12px;border-bottom:1px solid var(--line);position:relative}
-.khi-root .content-title::after{content:"";position:absolute;bottom:-1px;inset-inline-start:0;width:64px;height:2px;border-radius:2px;background:linear-gradient(to left,var(--pine-2),transparent)}
+.khi-root .content-title{padding-bottom:0;border-bottom:0}
 .khi-root .media-stage{border-radius:22px;box-shadow:0 30px 70px -38px rgba(12,44,29,.75)}
 .khi-root .detail-btn{transition:transform .2s,box-shadow .2s,border-color .2s,background .2s}
 .khi-root .detail-btn:hover{transform:translateY(-1px)}
@@ -1701,7 +1697,7 @@
 /* ── Help control — floats at the hero card's top-left corner ── */
 .khi-root .hero-corner{position:absolute;top:22px;left:26px;z-index:6}
 .khi-root .hero-corner .detail-btn{height:40px;padding:0 18px;border-radius:999px;background:rgba(255,255,255,.86);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(176,136,51,.42);color:var(--pine);font-size:13.5px;box-shadow:0 10px 22px -16px rgba(25,86,58,.55)}
-.khi-root .hero-corner .detail-btn:hover{border-color:var(--gold);background:#fff}
+.khi-root .hero-corner .detail-btn:hover{border-color:var(--pine-2);background:#fff}
 @media(max-width:640px){
   .khi-root .hero-corner{position:static;display:flex;justify-content:flex-end;margin:0 6px 14px}
 }
@@ -1718,8 +1714,8 @@
    with a short solid gold tick and fades away across the row. No section
    number, no Latin accent (user rules). */
 .khi-root .meta-panel-title{display:flex;flex-wrap:nowrap;align-items:center;gap:16px;min-height:0;margin:0;padding:0 2px 12px;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--ink)}
-.khi-root .meta-panel-title::after{content:"";flex:1 1 40px;min-width:28px;height:1px;background:linear-gradient(to left,var(--pine-2) 0 7px,rgba(33,112,73,.4) 7px,rgba(33,112,73,.04))}
-.khi-root .meta-panel-title-local{display:inline;gap:0;color:var(--ink);font-family:'Amiri','Vazirmatn',serif;font-size:20.5px;font-weight:700;line-height:1.5}
+.khi-root .meta-panel-title::after{content:none}
+.khi-root .meta-panel-title-local{display:inline;gap:0;color:var(--pine-deep);font-family:'Amiri','Vazirmatn',serif;font-size:20.5px;font-weight:700;line-height:1.5}
 .khi-root .meta-panel-title-local::after{content:none}
 
 /* field rows — a calm spec sheet, NOT a table of contents: the Sorani label
@@ -1857,7 +1853,7 @@
 
 /* ── Hero project link: just the name, no green fill ── */
 .khi-root .detail-btn.ghost{height:auto;padding:2px 0 7px;border:0;border-radius:0;background:transparent;color:var(--pine);font-size:16.5px;font-weight:800;box-shadow:none;border-bottom:2px solid rgba(176,136,51,.45);white-space:normal;text-align:start}
-.khi-root .detail-btn.ghost:hover{background:transparent;border-color:transparent;border-bottom-color:var(--gold);color:var(--pine-deep);transform:none;box-shadow:none}
+.khi-root .detail-btn.ghost:hover{background:transparent;border-color:transparent;border-bottom-color:var(--pine-2);color:var(--pine-deep);transform:none;box-shadow:none}
 
 /* ── Text-only hero (image pages): content spans the card ── */
 .khi-root .detail-hero.no-disc .hero-grid{grid-template-columns:1fr;min-height:0;padding:10px 28px 20px}
