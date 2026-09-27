@@ -1220,6 +1220,14 @@
 .khi-root .content-body p{margin:0;white-space:pre-line;word-break:break-word}
 .khi-root .content-card .player-mount{margin:0}
 
+/* Lyrics — verse is the artwork: centred lines in the heritage serif with
+   wide breathing room, a pine hairline ornament and no side chrome. */
+.khi-root .content-card.lyrics-card{background:linear-gradient(180deg,#fff 0%,#fbfdfc 100%);border-color:#dce8e0;padding:34px 30px 38px}
+.khi-root .content-card.lyrics-card .content-title{justify-content:center;padding-bottom:0;border-bottom:0;margin-bottom:6px;font-size:22px;color:var(--pine-deep)}
+.khi-root .content-card.lyrics-card .content-body{position:relative;padding-top:30px;text-align:center}
+.khi-root .content-card.lyrics-card .content-body::before{content:"";position:absolute;top:4px;left:50%;transform:translateX(-50%);width:72px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--pine-2),transparent)}
+.khi-root .content-card.lyrics-card .content-body p{max-width:660px;margin-inline:auto;font-family:'Amiri','Vazirmatn',serif;font-size:19px;line-height:2.55;color:#24473c;text-align:center}
+
 /* ── Media stage (image viewer / pdf) + unavailable note ────────────────── */
 .khi-root .media-stage{display:block;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#0c1611;box-shadow:0 24px 60px -34px rgba(12,44,29,.7);margin-bottom:22px}
 /* Image stage shrink-wraps the photo (aspect-ratio inline) — no dark bars. */

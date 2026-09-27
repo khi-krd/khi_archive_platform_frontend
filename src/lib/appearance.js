@@ -196,11 +196,11 @@ export function resolveAppearance(state) {
   const scale = findOrFirst(SCALE_PALETTE, merged.scale)
   const isDark = merged.mode === 'dark' || (merged.mode === 'system' && prefersDark())
   const tones = isDark ? accent.dark : accent.light
-  // The admin-uploaded site font (Admin → Settings → Site font) becomes the
-  // app typeface whenever the user keeps the DEFAULT family — an explicit
-  // pick in the tweaker still wins on staff workspaces. Mirrored in the
-  // index.html boot script.
-  const fontStack = merged.font === DEFAULT_APPEARANCE.font ? withSiteFont(font.stack) : font.stack
+  // An activated site font (Admin → Settings → Site font) is THE application
+  // typeface — it prepends every stack, and the injected cascade rule in
+  // applySiteFontFace also overrides the public skin's hardcoded families.
+  // Mirrored in the index.html boot script.
+  const fontStack = withSiteFont(font.stack)
   return {
     state: merged,
     isDark,

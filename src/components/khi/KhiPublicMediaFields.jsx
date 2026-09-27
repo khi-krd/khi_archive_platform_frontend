@@ -364,7 +364,9 @@ const FULL_MEDIA_FIELD_GROUPS = {
     {
       title: 'Content (ناوەڕۆک)',
       icon: IconText,
-      fields: ['abstractText', 'description', 'transcription', 'lyrics'],
+      // description lives in the page head; lyrics + transcription render as
+      // their own content cards — repeating them here would read twice.
+      fields: ['abstractText'],
     },
     {
       title: 'Music & Form (مۆسیقا و فۆڕم)',
@@ -430,12 +432,13 @@ const FULL_MEDIA_FIELD_GROUPS = {
     {
       title: 'Subject & Form (بابەت و فۆڕم)',
       icon: IconImage,
-      fields: ['description', 'subject', 'form', 'genre', 'event', 'location'],
+      // description sits in the page head, photostory in its own card.
+      fields: ['subject', 'form', 'genre', 'event', 'location'],
     },
     {
       title: 'Image Details (وردەکاریی وێنە)',
       icon: IconImage,
-      fields: ['personShownInImage', 'colorOfImage', 'whereThisImageUsed', 'photostory'],
+      fields: ['personShownInImage', 'colorOfImage', 'whereThisImageUsed'],
     },
     {
       title: 'Equipment (ئامێرەکان)',
@@ -499,7 +502,8 @@ const FULL_MEDIA_FIELD_GROUPS = {
     {
       title: 'Subject & Form (بابەت و فۆڕم)',
       icon: IconVideo,
-      fields: ['description', 'subject', 'genre', 'event', 'location'],
+      // description sits in the page head.
+      fields: ['subject', 'genre', 'event', 'location'],
     },
     {
       title: 'Video Details (وردەکاریی ڤیدیۆ)',
@@ -571,7 +575,8 @@ const FULL_MEDIA_FIELD_GROUPS = {
     {
       title: 'Document (بەڵگەنامە)',
       icon: IconBook,
-      fields: ['description', 'documentType', 'subject', 'genre', 'script', 'transcription', 'isbn', 'assignmentNumber', 'edition', 'volume', 'series'],
+      // description sits in the page head.
+      fields: ['documentType', 'subject', 'genre', 'script', 'transcription', 'isbn', 'assignmentNumber', 'edition', 'volume', 'series'],
     },
     {
       title: 'Language (زمان)',

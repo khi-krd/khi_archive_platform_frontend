@@ -59,7 +59,9 @@
           // uploaded face becomes the app font — mirrors resolveAppearance.
           try {
             var siteFont = JSON.parse(localStorage.getItem('khi-site-font') || 'null');
-            if (s.font === 'geist' && siteFont && siteFont.resolvedFileUrl) {
+            // An activated site font is the application typeface — it wins
+            // over every stack, including a tweaker pick on staff pages.
+            if (siteFont && siteFont.resolvedFileUrl) {
               fontStack = '"KHI Site Font", ' + fontStack;
               var sfExt = siteFont.resolvedFileUrl.split(/[?#]/)[0].split('.').pop().toLowerCase();
               var sfFmt = { woff2: 'woff2', woff: 'woff', ttf: 'truetype', otf: 'opentype' }[sfExt];
@@ -67,8 +69,13 @@
               sfStyle.id = 'khi-site-font-face';
               sfStyle.textContent = '@font-face{font-family:"KHI Site Font";src:url("' +
                 siteFont.resolvedFileUrl + '")' + (sfFmt ? ' format("' + sfFmt + '")' : '') +
-                ';font-weight:100 900;font-style:normal;font-display:swap}';
+                ';font-weight:100 900;font-style:normal;font-display:swap}' +
+                // The activated face wins over every hardcoded stack too
+                // (public skin uses literal Amiri/Vazirmatn); mono/code keep
+                // their own typeface — mirrors lib/site-font.js.
+                'html.khi-site-font-on body,html.khi-site-font-on body :not(code):not(kbd):not(pre):not(samp):not(.font-mono){font-family:"KHI Site Font","Vazirmatn","Amiri",ui-sans-serif,system-ui,sans-serif !important}';
               document.head.appendChild(sfStyle);
+              document.documentElement.classList.add('khi-site-font-on');
             }
           } catch (e) {}
 

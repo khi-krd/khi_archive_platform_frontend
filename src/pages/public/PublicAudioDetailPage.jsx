@@ -91,7 +91,7 @@ function PublicAudioDetailPage() {
 
   const content = (
     <>
-      {audio.lyrics ? <KhiContentCard icon={IconQuote} title={DETAIL.lyrics}><p>{audio.lyrics}</p></KhiContentCard> : null}
+      {audio.lyrics ? <KhiContentCard icon={IconQuote} title={DETAIL.lyrics} className="lyrics-card"><p>{audio.lyrics}</p></KhiContentCard> : null}
       {audio.transcription ? <KhiContentCard icon={IconText} title={DETAIL.transcription}><p>{audio.transcription}</p></KhiContentCard> : null}
     </>
   )

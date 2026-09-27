@@ -54,6 +54,7 @@ function applySiteFontFace(record) {
 
   if (!record?.resolvedFileUrl) {
     style?.remove()
+    document.documentElement.classList.remove('khi-site-font-on')
     return
   }
 
@@ -64,8 +65,14 @@ function applySiteFontFace(record) {
   }
 
   const src = `url("${record.resolvedFileUrl}")${fontFormatHint(record.resolvedFileUrl)}`
+  // While a site font is active it is THE typeface everywhere — the public
+  // catalogue hardcodes 'Amiri'/'Vazirmatn' stacks that bypass --font-sans,
+  // so the cascade below wins them all. True code/mono contexts keep their
+  // typeface so record codes and counters stay legible.
   style.textContent =
-    `@font-face{font-family:"KHI Site Font";src:${src};font-weight:100 900;font-style:normal;font-display:swap}`
+    `@font-face{font-family:"KHI Site Font";src:${src};font-weight:100 900;font-style:normal;font-display:swap}` +
+    `\nhtml.khi-site-font-on body,html.khi-site-font-on body :not(code):not(kbd):not(pre):not(samp):not(.font-mono){font-family:"KHI Site Font","Vazirmatn","Amiri",ui-sans-serif,system-ui,sans-serif !important}`
+  document.documentElement.classList.add('khi-site-font-on')
 }
 
 function getActiveSiteFont() {
