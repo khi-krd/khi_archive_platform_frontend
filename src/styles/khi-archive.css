@@ -1902,9 +1902,10 @@
 .khi-root .card .card-overlay{position:absolute;inset:auto 0 0 0;z-index:5;display:flex;flex-direction:column;gap:3px;padding:64px 14px 13px;text-align:start;color:#fff;background:linear-gradient(to top,rgba(25,86,58,.72) 0%,rgba(25,86,58,.3) 46%,rgba(25,86,58,0) 74%)}
 .khi-root .card .card-overlay::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
   background:linear-gradient(to top,rgba(25,86,58,.95) 0%,rgba(25,86,58,.78) 34%,rgba(25,86,58,.38) 68%,rgba(25,86,58,0) 100%);
-  opacity:0;transition:opacity .45s ease}
+  clip-path:inset(100% 0 0 0);
+  transition:clip-path .6s cubic-bezier(.22,.75,.25,1)}
 .khi-root .card:hover .card-overlay::after,
-.khi-root .card:focus-visible .card-overlay::after{opacity:1}
+.khi-root .card:focus-visible .card-overlay::after{clip-path:inset(0 0 0 0)}
 .khi-root .card.skeleton .card-overlay::after,
 .khi-root .khi-grid.list .card .card-overlay::after{content:none}
 /* room for the play/duration stack at the physical left */
