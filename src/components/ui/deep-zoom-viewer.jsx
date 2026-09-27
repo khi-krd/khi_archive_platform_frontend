@@ -17,7 +17,7 @@ function ControlButton({ onClick, label, children }) {
       onClick={onClick}
       aria-label={label}
       title={label}
-      className="grid size-8 place-items-center rounded-full border border-border/60 bg-background/85 text-foreground shadow-sm backdrop-blur-md transition hover:bg-background"
+      className="grid size-8 place-items-center rounded-md border border-border/60 bg-background/85 text-foreground shadow-sm backdrop-blur-md transition hover:bg-background"
     >
       {children}
     </button>
@@ -212,7 +212,7 @@ function DeepZoomViewer({ src, tileSources, alt = '', className, protectedMode =
         // <img> previews non-interactive. OpenSeadragon's pan/zoom/pinch
         // handlers need real pointer events to work, so this element always
         // opts back in regardless of what it's nested inside.
-        'group/zoom relative overflow-hidden rounded-2xl border bg-muted/20 shadow-sm shadow-black/5 pointer-events-auto cursor-grab active:cursor-grabbing',
+        'group/zoom relative flex flex-col overflow-hidden border bg-muted/20 shadow-sm shadow-black/5 pointer-events-auto',
         fitBox && 'size-full',
         !isFullscreen && !fitBox && 'min-h-[360px]',
         isFullscreen && 'bg-background',
@@ -223,39 +223,41 @@ function DeepZoomViewer({ src, tileSources, alt = '', className, protectedMode =
       role="img"
       aria-label={alt}
     >
-      <div ref={containerRef} className={cn('size-full', !isFullscreen && !fitBox && 'min-h-[360px]')} />
+      <div className={cn('relative min-h-0 flex-1 overflow-hidden cursor-grab active:cursor-grabbing', !isFullscreen && !fitBox && 'min-h-[360px]')}>
+        <div ref={containerRef} className="size-full" />
 
-      {protectedMode && !loading && !failed ? (
-        <KhiLogoWatermark
-          style={artBox
-            ? { inset: 'auto', left: artBox.left, top: artBox.top, width: artBox.width, height: artBox.height }
-            : undefined}
-        />
-      ) : null}
+        {protectedMode && !loading && !failed ? (
+          <KhiLogoWatermark
+            style={artBox
+              ? { inset: 'auto', left: artBox.left, top: artBox.top, width: artBox.width, height: artBox.height }
+              : undefined}
+          />
+        ) : null}
 
-      {loading && !failed ? (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-muted/20">
-          <Loader2 className="size-8 animate-spin text-muted-foreground" />
-        </div>
-      ) : null}
+        {loading && !failed ? (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-muted/20">
+            <Loader2 className="size-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : null}
 
-      {failed ? (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-muted/30 text-center text-sm text-muted-foreground">
-          <ImageOff className="size-8" />
-          <p>Could not load the image.</p>
-        </div>
-      ) : null}
+        {failed ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-muted/30 text-center text-sm text-muted-foreground">
+            <ImageOff className="size-8" />
+            <p>Could not load the image.</p>
+          </div>
+        ) : null}
+      </div>
 
       {!loading && !failed ? (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-end gap-2 p-2.5 opacity-0 transition-opacity group-hover/zoom:opacity-100 focus-within:opacity-100">
-          <div className="pointer-events-auto flex items-center gap-1.5">
-            <ControlButton onClick={zoomOut} label="Zoom out"><Minus className="size-4" /></ControlButton>
-            <ControlButton onClick={resetView} label="Reset view"><RotateCcw className="size-3.5" /></ControlButton>
-            <ControlButton onClick={zoomIn} label="Zoom in"><Plus className="size-4" /></ControlButton>
-            <ControlButton onClick={toggleFullscreen} label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}>
-              {isFullscreen ? <Minimize className="size-3.5" /> : <Maximize className="size-3.5" />}
-            </ControlButton>
-          </div>
+        // Toolbar lives BELOW the image — never floating over the artwork or
+        // the watermark logo, and always visible (no hover-to-reveal hunt).
+        <div className="flex items-center justify-end gap-1.5 border-t border-border/60 bg-background/95 px-2.5 py-2">
+          <ControlButton onClick={zoomOut} label="Zoom out"><Minus className="size-4" /></ControlButton>
+          <ControlButton onClick={resetView} label="Reset view"><RotateCcw className="size-3.5" /></ControlButton>
+          <ControlButton onClick={zoomIn} label="Zoom in"><Plus className="size-4" /></ControlButton>
+          <ControlButton onClick={toggleFullscreen} label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}>
+            {isFullscreen ? <Minimize className="size-3.5" /> : <Maximize className="size-3.5" />}
+          </ControlButton>
         </div>
       ) : null}
     </div>
