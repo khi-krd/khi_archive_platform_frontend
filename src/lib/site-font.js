@@ -64,15 +64,58 @@ function applySiteFontFace(record) {
     document.head.appendChild(style)
   }
 
+  renderFontStyle(style, record)
+  document.documentElement.classList.add('khi-site-font-on')
+  normalizeSiteFontSize(record, style)
+}
+
+// ── Optical size normalization ────────────────────────────────────────────
+// Uploaded faces ship arbitrary em metrics — the same 15px spec renders
+// visibly bigger or smaller than the Vazirmatn it replaces (the navbar text
+// grows/shrinks). Measure both faces' x-height once, bake a size-adjust into
+// the @font-face, and persist it on the record so the index.html boot script
+// bakes it in before first paint too. No font-size rule anywhere changes.
+const MEASURE_PX = 100
+const REFERENCE_STACK = '"Vazirmatn","Amiri",ui-sans-serif,system-ui,sans-serif'
+let measureCtx
+
+function measureXHeight(familyStack) {
+  if (!measureCtx) measureCtx = document.createElement('canvas').getContext('2d')
+  measureCtx.font = `${MEASURE_PX}px ${familyStack}`
+  return measureCtx.measureText('x').actualBoundingBoxAscent || 0
+}
+
+function renderFontStyle(style, record) {
   const src = `url("${record.resolvedFileUrl}")${fontFormatHint(record.resolvedFileUrl)}`
+  const sizeAdjust = record.sizeAdjust ? `;size-adjust:${record.sizeAdjust}%` : ''
   // While a site font is active it is THE typeface everywhere — the public
   // catalogue hardcodes 'Amiri'/'Vazirmatn' stacks that bypass --font-sans,
   // so the cascade below wins them all. True code/mono contexts keep their
   // typeface so record codes and counters stay legible.
   style.textContent =
-    `@font-face{font-family:"KHI Site Font";src:${src};font-weight:100 900;font-style:normal;font-display:swap}` +
-    `\nhtml.khi-site-font-on body,html.khi-site-font-on body :not(code):not(kbd):not(pre):not(samp):not(.font-mono){font-family:"KHI Site Font","Vazirmatn","Amiri",ui-sans-serif,system-ui,sans-serif !important}`
-  document.documentElement.classList.add('khi-site-font-on')
+    `@font-face{font-family:"KHI Site Font";src:${src};font-weight:100 900;font-style:normal;font-display:swap${sizeAdjust}}` +
+    `\nhtml.khi-site-font-on body,html.khi-site-font-on body :not(code):not(kbd):not(pre):not(samp):not(.font-mono){font-family:"KHI Site Font",${REFERENCE_STACK} !important}`
+}
+
+async function normalizeSiteFontSize(record, style) {
+  if (record.sizeAdjust) return // persisted from an earlier visit — already baked
+  try {
+    await Promise.race([
+      document.fonts.load(`${MEASURE_PX}px "KHI Site Font"`),
+      new Promise((_, reject) => setTimeout(reject, 4000)),
+    ])
+    await document.fonts.load(`${MEASURE_PX}px Vazirmatn`).catch(() => {})
+    const siteX = measureXHeight('"KHI Site Font"')
+    const refX = measureXHeight(REFERENCE_STACK)
+    if (!siteX || !refX) return
+    const adj = Math.round((refX / siteX) * 100)
+    if (adj < 55 || adj > 175) return // implausible metrics — leave untouched
+    record.sizeAdjust = adj
+    writeStoredFont(record)
+    if (record === cachedFont && style.isConnected) renderFontStyle(style, record)
+  } catch {
+    // Font never finished loading — keep the unadjusted face.
+  }
 }
 
 function getActiveSiteFont() {

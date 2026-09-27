@@ -69,7 +69,11 @@
               sfStyle.id = 'khi-site-font-face';
               sfStyle.textContent = '@font-face{font-family:"KHI Site Font";src:url("' +
                 siteFont.resolvedFileUrl + '")' + (sfFmt ? ' format("' + sfFmt + '")' : '') +
-                ';font-weight:100 900;font-style:normal;font-display:swap}' +
+                ';font-weight:100 900;font-style:normal;font-display:swap' +
+                // Persisted optical-size fix (measured vs Vazirmatn by
+                // lib/site-font.js) keeps the navbar/buttons at their
+                // designed size when the activated face takes over.
+                (siteFont.sizeAdjust ? ';size-adjust:' + siteFont.sizeAdjust + '%' : '') + '}' +
                 // The activated face wins over every hardcoded stack too
                 // (public skin uses literal Amiri/Vazirmatn); mono/code keep
                 // their own typeface — mirrors lib/site-font.js.
