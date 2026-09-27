@@ -410,13 +410,7 @@
 .khi-root :is(.m-project,.m-audio,.m-video,.m-image,.m-text)::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.42;background:
   repeating-linear-gradient(118deg,rgba(255,255,255,.025) 0 2px,transparent 2px 7px),
   radial-gradient(circle at 22% 18%,rgba(255,255,255,.08),transparent 35%)}
-/* Pale veil over the board — heaviest at the top, most transparent at the
-   bottom so the deepest green only hugs the controls row at rest. Hover
-   fades the veil away and the full gradient design returns. */
-.khi-root :is(.m-project,.m-audio,.m-video,.m-image,.m-text)::after{content:"";position:absolute;inset:0;z-index:5;pointer-events:none;border-radius:inherit;
-  background:linear-gradient(180deg,rgba(242,248,244,.94) 0%,rgba(242,248,244,.72) 52%,rgba(242,248,244,.26) 100%);
-  transition:opacity .5s ease}
-.khi-root .card:hover :is(.m-project,.m-audio,.m-video,.m-image,.m-text)::after{opacity:0}
+
 .khi-root .archive-rails{position:absolute;inset:0;z-index:0;pointer-events:none}
 .khi-root .archive-rails i{position:absolute;inset-inline:7.5%;height:7px;border-radius:999px;background:linear-gradient(180deg,#91967d,#7d846c);box-shadow:0 1px 0 rgba(255,255,255,.08),0 5px 13px rgba(8,25,18,.12)}
 .khi-root .archive-rails i:nth-child(1){top:23%}
@@ -643,7 +637,6 @@
   .khi-root .archive-tile,
   .khi-root .play,
   .khi-root .m-text .page,
-  .khi-root :is(.m-project,.m-audio,.m-video,.m-image,.m-text)::after,
   .khi-root .m-video .scrub i{transition:none}
   .khi-root .card:hover{transform:none}
   .khi-root .card:hover .media .cover-img{transform:none}
@@ -1677,6 +1670,7 @@
      reduced-motion disables (same specificity, later source order) */
   .khi-root .card,
   .khi-root .card::after,
+  .khi-root .card .card-overlay::after,
   .khi-root .card h3,
   .khi-root .card .card-open{transition:none}
   .khi-root .card:hover{transform:none}
@@ -1902,7 +1896,17 @@
 .khi-root .card:hover .media .cover-img{transform:scale(1.04)}
 
 /* ── The rising pine gradient + text ── */
-.khi-root .card .card-overlay{position:absolute;inset:auto 0 0 0;z-index:5;display:flex;flex-direction:column;gap:3px;padding:64px 14px 13px;text-align:start;color:#fff;background:linear-gradient(to top,rgba(25,86,58,.95) 0%,rgba(25,86,58,.78) 34%,rgba(25,86,58,.38) 68%,rgba(25,86,58,0) 100%)}
+/* At rest the green shadow is its thinnest, most transparent form — a soft
+   band that only reaches the title row. The full deep gradient lives on
+   ::after and fades in on hover, returning the original design. */
+.khi-root .card .card-overlay{position:absolute;inset:auto 0 0 0;z-index:5;display:flex;flex-direction:column;gap:3px;padding:64px 14px 13px;text-align:start;color:#fff;background:linear-gradient(to top,rgba(25,86,58,.72) 0%,rgba(25,86,58,.3) 46%,rgba(25,86,58,0) 74%)}
+.khi-root .card .card-overlay::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(to top,rgba(25,86,58,.95) 0%,rgba(25,86,58,.78) 34%,rgba(25,86,58,.38) 68%,rgba(25,86,58,0) 100%);
+  opacity:0;transition:opacity .45s ease}
+.khi-root .card:hover .card-overlay::after,
+.khi-root .card:focus-visible .card-overlay::after{opacity:1}
+.khi-root .card.skeleton .card-overlay::after,
+.khi-root .khi-grid.list .card .card-overlay::after{content:none}
 /* room for the play/duration stack at the physical left */
 .khi-root .card.kind-audio .card-overlay,
 .khi-root .card.kind-video .card-overlay{padding-left:72px}
