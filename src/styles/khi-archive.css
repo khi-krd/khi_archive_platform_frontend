@@ -404,12 +404,20 @@
    olive catalogue rails, cream media slips and restrained gold details. The
    same vocabulary carries through generated audio/video/image/text covers. */
 .khi-root :is(.m-project,.m-audio,.m-video,.m-image,.m-text){position:absolute;inset:8px;overflow:hidden;border:1px solid rgba(141,145,116,.72);border-radius:18px;background:
-  radial-gradient(120% 100% at 50% -10%,rgba(81,125,105,.2),transparent 58%),
-  linear-gradient(155deg,#294d42 0%,#1f4035 58%,#173229 100%);
+  radial-gradient(120% 100% at 50% -10%,rgba(81,125,105,.16),transparent 58%),
+  linear-gradient(155deg,#547a68 0%,#3d6352 58%,#2c4c3f 100%);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -22px 50px rgba(8,25,18,.1),0 10px 24px -18px rgba(13,31,24,.82);isolation:isolate}
 .khi-root :is(.m-project,.m-audio,.m-video,.m-image,.m-text)::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.42;background:
   repeating-linear-gradient(118deg,rgba(255,255,255,.025) 0 2px,transparent 2px 7px),
   radial-gradient(circle at 22% 18%,rgba(255,255,255,.08),transparent 35%)}
+/* Deep archival shade — at rest it is clipped to a thin transparent band
+   that only reaches the lower controls/title row; on hover it blooms over
+   the whole cover in one smooth clip transition. */
+.khi-root :is(.m-project,.m-audio,.m-video,.m-image,.m-text)::after{content:"";position:absolute;inset:0;z-index:5;pointer-events:none;border-radius:inherit;
+  background:linear-gradient(180deg,rgba(18,42,33,.1) 0%,rgba(14,34,27,.52) 52%,rgba(7,22,16,.9) 100%);
+  clip-path:inset(56% 0 0 0);
+  transition:clip-path .55s cubic-bezier(.2,.7,.2,1)}
+.khi-root .card:hover :is(.m-project,.m-audio,.m-video,.m-image,.m-text)::after{clip-path:inset(0 0 0 0)}
 .khi-root .archive-rails{position:absolute;inset:0;z-index:0;pointer-events:none}
 .khi-root .archive-rails i{position:absolute;inset-inline:7.5%;height:7px;border-radius:999px;background:linear-gradient(180deg,#91967d,#7d846c);box-shadow:0 1px 0 rgba(255,255,255,.08),0 5px 13px rgba(8,25,18,.12)}
 .khi-root .archive-rails i:nth-child(1){top:23%}
@@ -636,9 +644,11 @@
   .khi-root .archive-tile,
   .khi-root .play,
   .khi-root .m-text .page,
+  .khi-root :is(.m-project,.m-audio,.m-video,.m-image,.m-text)::after,
   .khi-root .m-video .scrub i{transition:none}
   .khi-root .card:hover{transform:none}
   .khi-root .card:hover .media .cover-img{transform:none}
+  .khi-root .card:hover :is(.m-project,.m-audio,.m-video,.m-image,.m-text)::after{clip-path:inset(0 0 0 0)}
   .khi-root .card:hover .m-project .project-text-tile{transform:rotate(-4deg)}
   .khi-root .card:hover .m-project .project-audio-tile{transform:rotate(-6deg)}
   .khi-root .card:hover .m-project .project-image-tile{transform:rotate(5deg)}
