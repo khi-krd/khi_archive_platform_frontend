@@ -7,6 +7,7 @@ import { IconField, PasswordField } from '@/components/auth/auth-fields'
 import { Button } from '@/components/ui/button'
 import { FormErrorBox } from '@/components/ui/form-error'
 import { formatApiError } from '@/lib/get-error-message'
+import { useUiText } from '@/lib/static-text'
 import { login } from '@/services/auth'
 
 // Bilingual notices shown when the session interceptor bounced the user here.
@@ -68,10 +69,17 @@ function LoginPage() {
     }
   }
 
+  // Admin-editable strings — bundled text renders until a row exists.
+  const title = useUiText('auth.loginTitle', 'Welcome back')
+  const description = useUiText(
+    'auth.loginDescription',
+    'Sign in with your username or email to continue to your archive.',
+  )
+
   return (
     <AuthShell
-      title="Welcome back"
-      description="Sign in with your username or email to continue to your archive."
+      title={title}
+      description={description}
       footer={
         <p>
           Don&apos;t have an account?{' '}
