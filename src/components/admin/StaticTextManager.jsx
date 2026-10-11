@@ -112,20 +112,29 @@ function StaticTextManager() {
     return counts
   }, [rows])
 
+  /**
+   * Search across the key AND both locales' text. The query may be a single
+   * word, a sentence, or any combination of words — every word must appear
+   * somewhere in the row, in any order. Arabic-script lookalikes are
+   * normalized so ي/ی and ك/ک match either way.
+   */
+  const normalize = useCallback(
+    (s) => s.toLowerCase().replace(/ي/g, 'ی').replace(/ك/g, 'ک').replace(/\s+/g, ' '),
+    [],
+  )
   const searching = search.trim().length > 0
   const visibleRows = useMemo(() => {
-    const q = search.trim().toLowerCase()
+    const words = normalize(search).split(' ').filter(Boolean)
     return rows.filter((r) => {
-      if (q) {
-        return (
-          r.key.toLowerCase().includes(q) ||
-          (drafts?.[r.key]?.ckb ?? '').toLowerCase().includes(q) ||
-          (drafts?.[r.key]?.ku ?? '').toLowerCase().includes(q)
+      if (words.length) {
+        const haystack = normalize(
+          `${r.key} ${drafts?.[r.key]?.ckb ?? ''} ${drafts?.[r.key]?.ku ?? ''}`,
         )
+        return words.every((w) => haystack.includes(w))
       }
       return pageOf(r) === page
     })
-  }, [rows, drafts, search, page])
+  }, [rows, drafts, search, page, normalize])
 
   const grouped = useMemo(() => {
     const bySection = new Map()
@@ -219,7 +228,7 @@ function StaticTextManager() {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="گەڕان لە هەموو لاپەڕەکان…"
+              placeholder="گەڕان بە وشە یان ڕستە لە هەموو دەقەکان…"
               className="w-64 ps-8"
             />
           </div>
@@ -276,6 +285,12 @@ function StaticTextManager() {
             <Plus className="me-1 h-4 w-4" /> کلیل زیاد بکە
           </Button>
         </div>
+
+        {searching && (
+          <p className="text-sm text-muted-foreground">
+            {visibleRows.length} دەق دۆزرایەوە — دەستکارییەکانی ئێرە پاشەکەوت دەکرێن.
+          </p>
+        )}
 
         {error && <p className="text-sm text-destructive">{error}</p>}
         {loading && <Skeleton className="h-40 w-full" />}
