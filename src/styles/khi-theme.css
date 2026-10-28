@@ -250,3 +250,62 @@
   background:#217049;
   box-shadow:0 18px 36px -14px rgba(25,86,58,.65), inset 0 1px 0 rgba(255,255,255,.2);
 }
+
+/* ── Thin themed scrollbars on every scroll pane inside a khi surface ───────
+   Same recipe as the public site + dashboard: a slim translucent thumb over
+   an invisible track. Scoped to the khi surfaces only — admin/employee panes
+   keep the OS default, matching this file's contract. The colour reads the
+   scope's own --muted-foreground, so paper (.khi-surface), white workspace
+   (.khi-teacher) and the .dark variants each get their own tint for free.
+   More specific pane rules keep winning: the help dialog's listbox/rail
+   override above (primary-tinted) and .khi-root's sidebar in khi-archive.css
+   are untouched. */
+.khi-surface,
+.khi-surface *,
+.khi-teacher,
+.khi-teacher *,
+.khi-help-dialog,
+.khi-help-dialog *{
+  scrollbar-width:thin;
+  scrollbar-color:color-mix(in srgb, var(--muted-foreground) 32%, transparent) transparent;
+}
+.khi-surface::-webkit-scrollbar,
+.khi-surface *::-webkit-scrollbar,
+.khi-teacher::-webkit-scrollbar,
+.khi-teacher *::-webkit-scrollbar,
+.khi-help-dialog::-webkit-scrollbar,
+.khi-help-dialog *::-webkit-scrollbar{
+  width:8px;
+  height:8px;
+}
+.khi-surface::-webkit-scrollbar-thumb,
+.khi-surface *::-webkit-scrollbar-thumb,
+.khi-teacher::-webkit-scrollbar-thumb,
+.khi-teacher *::-webkit-scrollbar-thumb,
+.khi-help-dialog::-webkit-scrollbar-thumb,
+.khi-help-dialog *::-webkit-scrollbar-thumb{
+  background:color-mix(in srgb, var(--muted-foreground) 32%, transparent);
+  border-radius:8px;
+}
+.khi-surface::-webkit-scrollbar-thumb:hover,
+.khi-surface *::-webkit-scrollbar-thumb:hover,
+.khi-teacher::-webkit-scrollbar-thumb:hover,
+.khi-teacher *::-webkit-scrollbar-thumb:hover,
+.khi-help-dialog::-webkit-scrollbar-thumb:hover,
+.khi-help-dialog *::-webkit-scrollbar-thumb:hover{
+  background:color-mix(in srgb, var(--muted-foreground) 52%, transparent);
+}
+.khi-surface::-webkit-scrollbar-track,
+.khi-surface *::-webkit-scrollbar-track,
+.khi-teacher::-webkit-scrollbar-track,
+.khi-teacher *::-webkit-scrollbar-track,
+.khi-help-dialog::-webkit-scrollbar-track,
+.khi-help-dialog *::-webkit-scrollbar-track,
+.khi-surface::-webkit-scrollbar-corner,
+.khi-surface *::-webkit-scrollbar-corner,
+.khi-teacher::-webkit-scrollbar-corner,
+.khi-teacher *::-webkit-scrollbar-corner,
+.khi-help-dialog::-webkit-scrollbar-corner,
+.khi-help-dialog *::-webkit-scrollbar-corner{
+  background:transparent;
+}
